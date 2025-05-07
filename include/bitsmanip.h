@@ -26,3 +26,19 @@ uint8_t bitstream_read_bit(BitStream* bs);
 // Peek at next n bits without consuming them
 uint32_t bitstream_peek_bits(BitStream* bs, int n);
 
+// Get fp
+FILE*get_fp(BitStream bs);
+
+// Get buffer
+uint8_t get_buffer(BitStream bs);
+
+// Get available bits
+int get_bits_available(BitStream bs);
+
+// Get total bytes read
+long get_bytes_read(BitStream bs);
+
+// Get is end of file
+int get_is_eof(BitStream bs);
+
+ 
