@@ -1,0 +1,12 @@
+{
+    "github.copilot.enable": {
+        "*": false,
+        "plaintext": true,
+        "markdown": false,
+        "scminput": false,
+        "python": true
+    },
+    "files.associations": {
+        "iqzz.C": "cpp"
+    }
+}

@@ -13,11 +13,15 @@ SRC_FILES=$(wildcard src/*.c)
 
 # Par défaut, la compilation de src/toto.c génère le fichier objet obj/toto.o
 OBJ_FILES=$(patsubst src/%.c,obj/%.o,$(SRC_FILES))
+rnd=bitsmanip
 
 all: jpeg2ppm
 
 jpeg2ppm: $(OBJ_FILES) 
 	$(LD) $(OBJ_FILES) $(LDFLAGS) -o $@
+
+bitsmanip: obj/bitsmanip.o
+	$(CC) $(CFLAGS) -o $@ $^
 
 obj/%.o: src/%.c
 	$(CC) -c $(CFLAGS) $< -o $@
@@ -25,4 +29,4 @@ obj/%.o: src/%.c
 .PHONY: clean
 
 clean:
-	rm -rf jpeg2ppm $(OBJ_FILES)
+	rm -rf jpeg2ppm $(OBJ_FILES) $(rnd)
