@@ -47,7 +47,7 @@ IMAGE* init_image() {
 
 IMAGE* read_jpeg(const char* file_name){
     BitStream* bs=bitstream_init(file_name);
-    IMAGE*image=init_image();// a implementer
+    IMAGE*image=init_image();
     uint16_t MARQUEUR=0;
     read_soi(bs);
     MARQUEUR=bitstream_peek_bits(bs,16);
@@ -153,7 +153,7 @@ void read_com(BitStream*bs,IMAGE*image){
         exit(0);
     }
     uint16_t section_size=bitstream_read_bits(bs,16);
-    image->COMMENTAIRE=malloc((section_size-1*sizeof(char)));
+    image->COMMENTAIRE=malloc((section_size-1)*sizeof(char));
     uint8_t byter=0;
     for(int16_t i=0;i<section_size-2;i++){
         byter=bitstream_read_bits(bs,8);
@@ -212,7 +212,7 @@ void read_sofx(BitStream*bs,IMAGE*image){
     }
     image->Hauteur=bitstream_read_bits(bs,16);
     image->Largeur=bitstream_read_bits(bs,16);
-    image->nb_components=bitstream_read_bits(bs,8);
+    image->nb_components+=bitstream_read_bits(bs,8);
     section_counter+=5;
     if(image->nb_components>3){
         printf("ERROR SOFX NB_COMPONENTS\n");
@@ -287,14 +287,13 @@ void read_sos(BitStream*bs,IMAGE*image){
     uint16_t section_size = bitstream_read_bits(bs, 16);
     uint16_t section_counter=2;
     uint8_t nb_components = bitstream_read_bits(bs, 8);
-    image->nb_components_sos = nb_components;
-    for(uint8_t i = 0; i < nb_components; i++){
+    for(uint8_t i = image->nb_components_sos; i < nb_components+image->nb_components_sos; i++){
         image->COMPONENTS_SOS[i].id = bitstream_read_bits(bs, 8);
         image->COMPONENTS_SOS[i].dc_table_id = bitstream_read_bits(bs, 4);
         image->COMPONENTS_SOS[i].ac_table_id = bitstream_read_bits(bs, 4);
         section_counter += 2;
     }
-    
+    image->nb_components_sos += nb_components;
     image->Ss = bitstream_read_bits(bs, 8);
     image->Se = bitstream_read_bits(bs, 8);
     image->Ah = bitstream_read_bits(bs, 4);
@@ -392,11 +391,11 @@ void print_image(const IMAGE* image) {
     }
 }
 
-int main() {
+// int main() {
 
-    IMAGE* image=read_jpeg("./images/poupoupidou_bw.jpg");
-    print_image(image);
+//     IMAGE* image=read_jpeg("./images/invader.jpeg");
+//     print_image(image);
 
-    printf("Lecture du JPEG termine.\n");
-    return 0;
-}
+//     printf("Lecture du JPEG termine.\n");
+//     return 0;
+// }
