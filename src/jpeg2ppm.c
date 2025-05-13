@@ -11,18 +11,18 @@
 #include <stdint.h>
 
 int main(int argc, char* argv[]) {
-    if (argc != 2) {
-        printf("Usage: %s <input_file>\n", argv[0]);
-        return 1;
-    }
+    // if (argc != 2) {
+    //     printf("Usage: %s <input_file>\n", argv[0]);
+    //     return 1;
+    // }
 
-    IMAGE* image = read_jpeg(argv[1]);
+    IMAGE* image = read_jpeg("./images/invader.jpeg");
     if (!image) {
         fprintf(stderr, "Erreur de lecture du fichier JPEG.\n");
         return 2;
     }
 
-    IMAGE_D* image_d = malloc(sizeof(IMAGE_D));
+    IMAGE_D* image_d = init_image_d();
     if (!image_d) {
         fprintf(stderr, "Erreur d'allocation mémoire.\n");
         return 3;
@@ -34,18 +34,17 @@ int main(int argc, char* argv[]) {
     int nb_mcus_x = image->Largeur / 8;
     int nb_mcus_y = image->Hauteur / 8;
     int nbr_mcus = nb_mcus_x * nb_mcus_y;
-
+    int** bloc_ap =NULL;
+    char** huffman_dc=NULL;
+    char** huffman_ac =NULL;
     for (int mcu = 0; mcu < nbr_mcus; mcu++) {
-        
-       
-
         // Générer à nouveau les tables Huffman (au cas où elles changent dynamiquement)
-        char** huffman_dc = generer_codes_huffman(
+        huffman_dc = generer_codes_huffman(
             image->HUFFMAN_tables[0].symbols,
             image->HUFFMAN_tables[0].tailles,
             image->HUFFMAN_tables[0].nb_symbols);
 
-        char** huffman_ac = generer_codes_huffman(
+        huffman_ac = generer_codes_huffman(
             image->HUFFMAN_tables[2].symbols,
             image->HUFFMAN_tables[2].tailles,
             image->HUFFMAN_tables[2].nb_symbols);
@@ -75,7 +74,7 @@ int main(int argc, char* argv[]) {
             if ((i + 1) % 8 == 0) printf("\n");
         }
 
-        int** bloc_ap = malloc(8 * sizeof(int*));
+        bloc_ap = malloc(8 * sizeof(int*));
         for (int i = 0; i < 8; i++) {
             bloc_ap[i] = malloc(8 * sizeof(int));
         }
@@ -101,26 +100,26 @@ int main(int argc, char* argv[]) {
         }
 
         // Libérations
-        for (int i = 0; i < 8; i++) free(bloc_ap[i]);
-        free(bloc_ap);
         free_huffman_table(huffman_dc, image->HUFFMAN_tables[0].nb_symbols);
         free_huffman_table(huffman_ac, image->HUFFMAN_tables[2].nb_symbols);
-    }
-    if(image->nb_components == 3){
-        image_d->colors = 1;
-        image_d->R = malloc(image->Largeur * image->Hauteur);
-        image_d->G = malloc(image->Largeur * image->Hauteur);
-        image_d->B = malloc(image->Largeur * image->Hauteur);
-        //ycbcr_to_rgb(image, image_d);
-    }else{
-        image_d->colors = 0;
-        image_d->R = malloc(image->Largeur * image->Hauteur);
-        image_d->G = NULL;
-        image_d->B = NULL;
-        for(int i=0;i<image->Largeur*image->Hauteur;i++){
-            image_d->R[i] = (uint8_t)bloc[i];
+        if(image->nb_components == 3){
+            image_d->colors = 1;
+            image_d->R = malloc(image->Largeur * image->Hauteur);
+            image_d->G = malloc(image->Largeur * image->Hauteur);
+            image_d->B = malloc(image->Largeur * image->Hauteur);
+            //ycbcr_to_rgb(image, image_d);
+        }else{
+            image_d->colors = 0;
+            image_d->R = malloc(image->Largeur * image->Hauteur);
+            image_d->G = NULL;
+            image_d->B = NULL;
+            for(int i=0;i<image->Largeur*image->Hauteur;i++){
+                image_d->R[i] = (uint8_t)bloc[i];
+            }
+            write_image("output.pgm", *image_d);
         }
-        write_image("output.pgm", *image_d);
+        for (int i = 0; i < 8; i++) free(bloc_ap[i]);
+        free(bloc_ap);
     }
     return 0;
 }

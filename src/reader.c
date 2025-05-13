@@ -187,7 +187,7 @@ void read_dqt(BitStream*bs,IMAGE*image){
         }else{
             byter_size=16;
         }
-        image->Quant_Table[table_id]=malloc(64*sizeof(uint8_t));
+        image->Quant_Table[table_id]=malloc(64*sizeof(uint16_t));
         for(uint8_t i=0;i<64;i++){
             byter=bitstream_read_bits(bs,byter_size);
             image->Quant_Table[table_id][i]=byter;
@@ -304,13 +304,13 @@ void read_sos(BitStream*bs,IMAGE*image){
         exit(0);
     }
 
-    size_t compressed_data_buffer_size = 1024;
-    uint8_t* holding_buffer = malloc(compressed_data_buffer_size*sizeof(uint8_t));
+    size_t compressed_data_buffer_size = 1024*1024;
+    uint8_t* holding_buffer = malloc(compressed_data_buffer_size);
     size_t position = 0;
     uint8_t byter=0;
     while(marqueur!=EOI){
         byter = bitstream_read_bits(bs, 8);
-        if (position >= compressed_data_buffer_size) {
+        if (position == compressed_data_buffer_size) {
             compressed_data_buffer_size *= 2;
             holding_buffer = realloc(holding_buffer, compressed_data_buffer_size);
         }

@@ -2,6 +2,24 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
+
+IMAGE_D* init_image_d(){
+    IMAGE_D* image = malloc(sizeof(IMAGE_D));
+    if (!image) {
+        fprintf(stderr, "Erreur d'allocation IMAGE_D\n");
+        exit(1);
+    }
+    image->R = NULL;
+    image->G = NULL;
+    image->B = NULL;
+    image->width = 0;
+    image->height = 0;
+    image->colors = 0;
+    return image;
+}
+
+
+
 void free_image(IMAGE_D* image){
     if(image->R != NULL) {
         free(image->R);
@@ -12,10 +30,10 @@ void free_image(IMAGE_D* image){
     if(image->B != NULL) {
         free(image->B);
     }
-    free(image);
+    //free(image);
 }
 void write_image(const char* file_name,IMAGE_D image){
-    FILE* file = fopen(file_name, "wb");
+    FILE* file = fopen(file_name, "wa");
     if (file == NULL) {
         fprintf(stderr, "Error opening file %s\n", file_name);
         return;
@@ -34,6 +52,7 @@ void write_image(const char* file_name,IMAGE_D image){
                 fprintf(file,"%04u ",image.R[i * image.width + j]);
             }
         }
+        fprintf(file, "\n");
     }
     fprintf(file, "\n");
     free_image(&image);
