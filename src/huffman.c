@@ -5,15 +5,29 @@
 #include "huffman.h"
 #include "bitsmanip.h"
 
-static uint8_t read_bit(const uint8_t *data, size_t *bit_pos) {
-    uint8_t byte = data[*bit_pos / 8];
-    uint8_t bit = (byte >> (7 - (*bit_pos % 8))) & 1;
+uint8_t read_bit(const uint8_t *data, size_t *bit_pos) {
+    static size_t prev_byte_index = SIZE_MAX;
+    size_t byte_index = *bit_pos / 8;
+    size_t bit_offset = *bit_pos % 8;   
+    if (byte_index != prev_byte_index && byte_index > 0 &&
+        data[byte_index - 1] == 0xFF && data[byte_index] == 0x00) {
+        byte_index++;
+        *bit_pos += 8; 
+    }
+
+    if (byte_index >= SIZE_MAX) {
+        prev_byte_index = byte_index;
+    }
+
+    uint8_t byte = data[byte_index];
+    uint8_t bit = (byte >> (7 - bit_offset)) & 1;
+
     (*bit_pos)++;
+    prev_byte_index = byte_index;
     return bit;
 }
 
-
-static uint32_t read_bits(const uint8_t *data, size_t *bit_pos, int n) {
+uint32_t read_bits(const uint8_t *data, size_t *bit_pos, int n) {
     uint32_t value = 0;
     for (int i = 0; i < n; i++) {
         value = (value << 1) | read_bit(data, bit_pos);
@@ -125,8 +139,8 @@ void decoder_bloc(
         if (symbole_ac == 0x00) {
             break;
         }
-        if (symbole_ac == 0xf0) {
-            j += 16;
+        if (symbole_ac == 0xF0) {
+            j += 15;
         } else {
             j += run;
         }

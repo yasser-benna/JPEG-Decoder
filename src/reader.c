@@ -304,8 +304,8 @@ void read_sos(BitStream*bs,IMAGE*image){
         exit(0);
     }
 
-    size_t compressed_data_buffer_size = 1024 * 1024;
-    uint8_t* holding_buffer = malloc(compressed_data_buffer_size);
+    size_t compressed_data_buffer_size = 1024;
+    uint8_t* holding_buffer = malloc(compressed_data_buffer_size*sizeof(uint8_t));
     size_t position = 0;
     uint8_t byter=0;
     while(marqueur!=EOI){

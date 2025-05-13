@@ -5,6 +5,10 @@
 #include <stdint.h>
 #include "bitsmanip.h"
 
+
+uint8_t read_bit(const uint8_t *data, size_t *bit_pos) ;
+uint32_t read_bits(const uint8_t *data, size_t *bit_pos, int n);
+
 char **generer_codes_huffman(uint8_t symbols[256], uint8_t taille[16], int n_symboles);
 
 // -taille est un  tableau représentant le nombre de codes de chaque longueur (de 1 à 16 bits).
