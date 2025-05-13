@@ -14,7 +14,7 @@
 #define DHT 0xffc4
 #define SOS 0xffda
 
-
+// function to initialize the image structure
 IMAGE* init_image() {
     IMAGE* img = malloc(sizeof(IMAGE));
     if (!img) {
@@ -44,7 +44,7 @@ IMAGE* init_image() {
     return img;
 }
 
-
+// function to read the jpeg file
 IMAGE* read_jpeg(const char* file_name){
     BitStream* bs=bitstream_init(file_name);
     IMAGE*image=init_image();
@@ -81,6 +81,7 @@ IMAGE* read_jpeg(const char* file_name){
     bitstream_close(bs);
     return image;
 }
+// function to clear SOI section
 void read_soi(BitStream*bs){
     uint16_t marqueur=0;
     marqueur=bitstream_read_bits(bs,16);
@@ -89,7 +90,7 @@ void read_soi(BitStream*bs){
         exit(0);
     } 
 }
-
+// function to clear EOI section
 void read_eoi(BitStream*bs){
     uint16_t marqueur=0;
     marqueur=bitstream_read_bits(bs,16);
@@ -98,7 +99,7 @@ void read_eoi(BitStream*bs){
         exit(0);
     }
 }
-
+// function to clear APPX section
 void read_appx(BitStream*bs,IMAGE*image){
     uint16_t marqueur=0;
     marqueur=bitstream_read_bits(bs,16);
@@ -145,6 +146,7 @@ void read_appx(BitStream*bs,IMAGE*image){
     image->APPX=0;
     bitstream_read_bits(bs,(section_size-9)*8);
 }
+// function to clear COM section
 void read_com(BitStream*bs,IMAGE*image){
     uint16_t marqueur=0;
     marqueur=bitstream_read_bits(bs,16);
@@ -161,6 +163,7 @@ void read_com(BitStream*bs,IMAGE*image){
     }
     image->COMMENTAIRE[section_size-2]='\0';
 }
+// function to clear DQT section
 void read_dqt(BitStream*bs,IMAGE*image){
     uint16_t marqueur=0;
     marqueur=bitstream_read_bits(bs,16);
@@ -195,6 +198,7 @@ void read_dqt(BitStream*bs,IMAGE*image){
 
     }
 }
+// function to clear SOF0 section
 void read_sofx(BitStream*bs,IMAGE*image){
     uint16_t marqueur=0;
     marqueur=bitstream_read_bits(bs,16);
@@ -232,6 +236,7 @@ void read_sofx(BitStream*bs,IMAGE*image){
     }
 
 }
+// function to clear DHT section
 void read_dht(BitStream*bs,IMAGE*image){
     uint16_t marqueur=0;
     marqueur=bitstream_read_bits(bs,16);
@@ -277,6 +282,7 @@ void read_dht(BitStream*bs,IMAGE*image){
         }
     }
 }
+// function to clear SOS section
 void read_sos(BitStream*bs,IMAGE*image){
     uint16_t marqueur =0;
     marqueur= bitstream_read_bits(bs, 16);
@@ -321,76 +327,7 @@ void read_sos(BitStream*bs,IMAGE*image){
     image->compressed_size=position;
 }
 
-
-void print_image(const IMAGE* image) {
-    printf("Largeur: %d\n", image->Largeur);
-    printf("Hauteur: %d\n", image->Hauteur);
-    printf("Nombre de composantes: %d\n", image->nb_components);
-    for (int i = 0; i < image->nb_components; i++) {
-        printf("  Composante %d:\n", i);
-        printf("    id: %d\n", image->COMPONENTS[i].id);
-        printf("    h_factor: %d\n", image->COMPONENTS[i].h_factor);
-        printf("    v_factor: %d\n", image->COMPONENTS[i].v_factor);
-        printf("    qt_id: %d\n", image->COMPONENTS[i].qt_id);
-    }
-    for (int i = 0; i < 4; i++) {
-        if (image->Quant_Table[i]) {
-            printf("Quant_Table[%d]: \n", i);
-            printf("           ");
-            for (int j = 0; j < 8; j++) {
-                for (int k = 0; k < 8; k++) {
-                    printf("%3d ", image->Quant_Table[i][j * 8 + k]);
-                }
-                printf("\n           ");
-            }
-            printf("\n");
-        }
-    }
-    for (int i = 0; i < 4; i++) {
-        const HUFFMAN_TABLE* ht = &image->HUFFMAN_tables[i];
-        if (ht->nb_symbols > 0) {
-            printf("Huffman Table %d (%s):\n", i, (i < 2) ? "DC" : "AC");
-            printf("  id: %d, ac_dc: %d, nb_symbols: %d\n", ht->id, ht->ac_dc, ht->nb_symbols);
-            printf("  Tailles: ");
-            for (int j = 0; j < 16; j++) {
-                printf("%d ", ht->tailles[j]);
-            }
-            printf("\n  Symbols: ");
-            for (int j = 0; j < ht->nb_symbols; j++) {
-                printf("%02x ", ht->symbols[j]);
-            }
-            printf("\n");
-        }
-    }
-
-    printf("Section SOS:\n");
-    printf("  Nb composants SOS: %d\n", image->nb_components_sos);
-    for (int i = 0; i < image->nb_components_sos; i++) {
-        printf("    Composant %d: id=%d, dc_table_id=%d, ac_table_id=%d\n",
-            i,
-            image->COMPONENTS_SOS[i].id,
-            image->COMPONENTS_SOS[i].dc_table_id,
-            image->COMPONENTS_SOS[i].ac_table_id
-        );
-    }
-    printf("  Ss: %d, Se: %d, Ah: %d, Al: %d\n", image->Ss, image->Se, image->Ah, image->Al);
-
-    printf("Compressed data (taille: %zu):\n", image->compressed_size);
-    size_t to_print = image->compressed_size < 32 ? image->compressed_size : 32;
-    for (size_t i = 0; i < to_print; i++) {
-        printf("%02x ", image->compressed_data[i]);
-    }
-    if (image->compressed_size > to_print) {
-        printf("...");
-    }
-    printf("\n");
-
-
-    if (image->COMMENTAIRE) {
-        printf("Commentaire: %s\n", image->COMMENTAIRE);
-    }
-}
-
+// Test function
 // int main() {
 
 //     IMAGE* image=read_jpeg("./images/invader.jpeg");

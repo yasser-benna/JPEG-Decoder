@@ -32,10 +32,9 @@ void free_image(IMAGE_D* image){
     }
     //free(image);
 }
-void write_image(const char* file_name,IMAGE_D image){
-    FILE* file = fopen(file_name, "wa");
+void write_image(FILE*file,IMAGE_D image){
     if (file == NULL) {
-        fprintf(stderr, "Error opening file %s\n", file_name);
+        fprintf(stderr, "Error opening file \n");
         return;
     }
     
@@ -56,6 +55,4 @@ void write_image(const char* file_name,IMAGE_D image){
     }
     fprintf(file, "\n");
     free_image(&image);
-    fclose(file);
-
 }

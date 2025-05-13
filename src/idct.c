@@ -5,35 +5,50 @@
 #include "idct.h"
 #define N 8
 #define PI 3.14159265358979323846
-
+// Function to find the coeff_c
 double coeff_c(int xi) {
-    return (xi==0) ? 1.0 / sqrt(2.0) : 1.0;
+    if(xi < 0 || xi >= N) {
+        fprintf(stderr, "Error: xi must be in the range [0, %d)\n", N);
+        exit(0);
+    }
+    if (xi==0){
+        return 1.0 / sqrt(2.0);
+    }
+    return  1.0;
 }
+// Function to perform the IDCT unefficiently
 void idct_ptr(int **freq_block, unsigned char ***spatial_block) {
     *spatial_block = malloc(N * sizeof(unsigned char *));
+    double sum = 0.0;
+    double ci=0.0;
+    double cj=0.0;
+    double cos1=0.0;
+    double cos2=0.0;
+    double val=0.0;
     for (int k = 0; k < N; k++) {
         (*spatial_block)[k] = malloc(N * sizeof(unsigned char *));
     }
     for (int x = 0; x < N; x++) {
         for (int y = 0; y < N; y++) {
-            double sum = 0.0;
+            sum = 0.0;
             for (int i = 0; i < N; i++) {
                 for (int j = 0; j < N; j++) {
-                    double ci = coeff_c(i);
-                    double cj = coeff_c(j);
-                    double cos1 = cos(((2 * x + 1) * i * PI) / (2.0 * N));
-                    double cos2 = cos(((2 * y + 1) * j * PI) / (2.0 * N));
+                    ci = coeff_c(i);
+                    cj = coeff_c(j);
+                    cos1 = cos(((2 * x + 1) * i * PI) / (2.0 * N));
+                    cos2 = cos(((2 * y + 1) * j * PI) / (2.0 * N));
                     sum += ci * cj * cos1 * cos2 * freq_block[i][j];
                 }
             }
-            double val = sum / sqrt(2.0 * N) + 128.0;
+            val = sum / sqrt(2.0 * N) + 128.0;
             if (val < 0.0) val = 0.0;
             if (val > 255.0) val = 255.0;
-
             (*spatial_block)[x][y] = (unsigned char)(round(val));
         }
     }
 }
+
+// Test function
 
 // int main(){
 //     int16_t **freq_block;

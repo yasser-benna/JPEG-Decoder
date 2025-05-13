@@ -1,14 +1,14 @@
 #pragma once
 #include <stdint.h>
-
-
+#include "bitsmanip.h"
+// struct to hold the information of SOF0 components
 typedef struct COMPONENT{
     uint8_t id;
     uint8_t h_factor;
     uint8_t v_factor;
     uint8_t qt_id;
 } COMPONENT;
-
+ // struct to hold the information of Huffman tables
 typedef struct HUFF_TAB{
     uint8_t id;
     uint8_t ac_dc;
@@ -16,14 +16,14 @@ typedef struct HUFF_TAB{
     uint8_t tailles[16];
     int nb_symbols;
 }HUFFMAN_TABLE;
-
+// struct to hold the information of SOS components
 typedef struct {
     uint8_t id;
     uint8_t dc_table_id;
     uint8_t ac_table_id;
 } SOS_COMPONENT;
 
-
+// struct to hold the information of the image
 typedef struct IMAGE{
     int APPX;
     char* COMMENTAIRE;
@@ -43,9 +43,11 @@ typedef struct IMAGE{
 
 
 
-
+// funtion to initialize the image structure
 IMAGE* init_image();
+// function to read the jpeg file
 IMAGE* read_jpeg(const char* file_name);
+
 void read_soi(BitStream*bs);
 void read_eoi(BitStream*bs);
 void read_appx(BitStream*bs,IMAGE*image);
