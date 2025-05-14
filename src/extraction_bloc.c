@@ -1,10 +1,11 @@
 #include <stdio.h>  
 #include <stdlib.h> 
 #include <stdint.h>   
-#include <string.h>  
+#include <string.h> 
 #include "huffman.h"
 #include "bitsmanip.h"
 #include "extraction_bloc.h"
+#include "reader.h"
 
 
 void extraire_bloc(const uint8_t *data, size_t *bit_pos,
@@ -27,9 +28,11 @@ void extraire_bloc(const uint8_t *data, size_t *bit_pos,
     int nb_blocs_C = H_C * V_C;
 
     // Allocation
-    *Y  = malloc(total_mcus * sizeof(int **));
+    *Y  = malloc(total_mcus * sizeof(int **));    
     *Cb = malloc(total_mcus * sizeof(int **));
     *Cr = malloc(total_mcus * sizeof(int **));
+    
+
 
     int dc_prec_Y = 0;
     int dc_prec_Cb = 0;
@@ -44,23 +47,25 @@ void extraire_bloc(const uint8_t *data, size_t *bit_pos,
                          table_huffman_ac_Y, symboles_ac_Y, nbr_sym_ac_Y,
                          &dc_prec_Y, (*Y)[mcu][i]);
         }
-
+        
         (*Cb)[mcu] = malloc(nb_blocs_C * sizeof(int *));
         for (int i = 0; i < nb_blocs_C; i++) {
             (*Cb)[mcu][i] = malloc(64 * sizeof(int));
             decoder_bloc(data, bit_pos,
-                         table_huffman_dc_C, symboles_dc_C, nbr_sym_dc_C,
-                         table_huffman_ac_C, symboles_ac_C, nbr_sym_ac_C,
-                         &dc_prec_Cb, (*Cb)[mcu][i]);
+                            table_huffman_dc_C, symboles_dc_C, nbr_sym_dc_C,
+                            table_huffman_ac_C, symboles_ac_C, nbr_sym_ac_C,
+                            &dc_prec_Cb, (*Cb)[mcu][i]);
         }
 
         (*Cr)[mcu] = malloc(nb_blocs_C * sizeof(int *));
         for (int i = 0; i < nb_blocs_C; i++) {
             (*Cr)[mcu][i] = malloc(64 * sizeof(int));
             decoder_bloc(data, bit_pos,
-                         table_huffman_dc_C, symboles_dc_C, nbr_sym_dc_C,
-                         table_huffman_ac_C, symboles_ac_C, nbr_sym_ac_C,
-                         &dc_prec_Cr, (*Cr)[mcu][i]);
+                            table_huffman_dc_C, symboles_dc_C, nbr_sym_dc_C,
+                            table_huffman_ac_C, symboles_ac_C, nbr_sym_ac_C,
+                            &dc_prec_Cr, (*Cr)[mcu][i]);
         }
+        
     }
+
 }

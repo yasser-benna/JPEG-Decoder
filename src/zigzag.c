@@ -1,7 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "zigzag.h"  
+#include "zigzag.h"
+#include <stdint.h>  
  /*
   La fonction inverse_zigzag reconstruit une matrice 8×8 à partir d'un vecteur de 64 éléments,
   en suivant l'ordre inverse du parcours en zigzag utilisé dans l'encodage JPEG.
@@ -14,7 +15,7 @@
   prenant les valeurs du vecteur dans l'ordre, en avançant un indice `i` à chaque affectation.
  */
 
-void inverse_zigzag(int* vecteur, int **bloc) {
+void inverse_zigzag(int* vecteur, int16_t **bloc) {
     // init
     int i = 0;
     int col=0;

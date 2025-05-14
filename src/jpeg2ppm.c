@@ -268,6 +268,218 @@
 // }
 
 
+// #include <stdio.h>
+// #include <stdlib.h>
+// #include <stdint.h>
+// #include "writter.h"
+// #include "reader.h"
+// #include "huffman.h"
+// #include "bitsmanip.h"
+// #include "extraction_bloc.h"
+// #include "iqzz.h"
+// #include "zigzag.h"
+// #include "idct.h"
+// #include "upsampling.h"
+// #include "ycbcr_rgb.h"
+
+
+// int main(int argc, char* argv[]) {
+//     if (argc != 2) {
+//         printf("Usage: %s <input_file>\n", argv[0]);
+//         return 1;
+//     }
+
+//     IMAGE* image = read_jpeg(argv[1]);
+//     if (!image) {
+//         fprintf(stderr, "Erreur de lecture du fichier JPEG.\n");
+//         return 2;
+//     }
+//     // Vérifier les facteurs de sous-échantillonnage pour les composants Cb et Cr
+//     int H_Y = image->COMPONENTS[0].h_factor;  
+//     int V_Y = image->COMPONENTS[0].v_factor;
+//     int H_C = image->COMPONENTS[1].h_factor;  
+//     int V_C = image->COMPONENTS[1].v_factor;
+
+//     int forbloc;
+//     if (H_Y == H_C && V_Y == V_C) forbloc = 0;       // 4:4:4
+//     else if (H_Y == 2 * H_C && V_Y == V_C) forbloc = 1;  // 4:2:2
+//     else if (H_Y == 2 * H_C && V_Y == 2 * V_C) forbloc = 2; // 4:2:0
+//     else {
+//         fprintf(stderr, "Forbloc de sous-échantillonnage non supporté.\n");
+//         return 3;
+//     }
+
+//     // Dimensions en blocs
+//     int nb_mcus_x = (image->Largeur  ) / (8 * H_Y);
+//     int nb_mcus_y = (image->Hauteur ) / (8 * V_Y);
+//     int total_mcus = nb_mcus_x * nb_mcus_y;
+//     int nb_blocs_Y = H_Y * V_Y;
+//     int nb_blocs_C = H_C * V_C;
+
+//     int ****Y_blocs, ****Cb_blocs = NULL, ****Cr_blocs = NULL;
+//     size_t bit_pos = 0;
+
+//     char** huffman_dc_Y = generer_codes_huffman(
+//         image->HUFFMAN_tables[0].symbols,
+//         image->HUFFMAN_tables[0].tailles,
+//         image->HUFFMAN_tables[0].nb_symbols);
+
+//     char** huffman_ac_Y = generer_codes_huffman(
+//         image->HUFFMAN_tables[2].symbols,
+//         image->HUFFMAN_tables[2].tailles,
+//         image->HUFFMAN_tables[2].nb_symbols);
+//     char** huffman_dc_C = generer_codes_huffman(
+//         image->HUFFMAN_tables[1].symbols,
+//         image->HUFFMAN_tables[1].tailles,
+//         image->HUFFMAN_tables[1].nb_symbols);
+
+//     char** huffman_ac_C = generer_codes_huffman(
+//         image->HUFFMAN_tables[3].symbols,
+//         image->HUFFMAN_tables[3].tailles,
+//         image->HUFFMAN_tables[3].nb_symbols);
+
+//     // Extraction blocs DCT
+//     extraire_bloc(
+//         image->compressed_data, &bit_pos,
+//         huffman_dc_Y, image->HUFFMAN_tables[0].symbols, image->HUFFMAN_tables[0].nb_symbols,
+//         huffman_ac_Y, image->HUFFMAN_tables[2].symbols, image->HUFFMAN_tables[2].nb_symbols,
+//         huffman_dc_C, image->HUFFMAN_tables[1].symbols, image->HUFFMAN_tables[1].nb_symbols,
+//         huffman_ac_C, image->HUFFMAN_tables[3].symbols, image->HUFFMAN_tables[3].nb_symbols,
+//         H_Y, H_C, V_Y, V_C,
+//         image->Largeur, image->Hauteur,
+//         &Y_blocs, &Cb_blocs, &Cr_blocs
+//     );
+
+//     unsigned char ****Y_final = malloc(total_mcus * sizeof(unsigned char***));
+//     for (int mcu = 0; mcu < total_mcus; mcu++) {
+//         Y_final[mcu] = malloc(nb_blocs_Y * sizeof(unsigned char**));
+//         for (int b = 0; b < nb_blocs_Y; b++) {
+//             int **Y_bloc = malloc(8 * sizeof(int*));
+//             for (int i = 0; i < 8; i++) Y_bloc[i] = malloc(8 * sizeof(int));
+
+//             quantification_inverse(Y_blocs[mcu][b], image->Quant_Table[0]);
+//             inverse_zigzag(Y_blocs[mcu][b], Y_bloc);
+//             idct_ptr(Y_bloc, &Y_final[mcu][b]);
+
+//             for (int i = 0; i < 8; i++) free(Y_bloc[i]);
+//             free(Y_bloc);
+//         }
+//     }
+
+    
+//     unsigned char ****Cb_final = malloc(total_mcus * sizeof(unsigned char***));
+//     unsigned char ****Cr_final = malloc(total_mcus * sizeof(unsigned char***));
+
+//     for (int mcu = 0; mcu < total_mcus; mcu++) {
+//         Cb_final[mcu] = malloc(nb_blocs_C * sizeof(unsigned char**));
+//         Cr_final[mcu] = malloc(nb_blocs_C * sizeof(unsigned char**));
+
+//         for (int b = 0; b < nb_blocs_C; b++) {
+//             int **cb_bloc = malloc(8 * sizeof(int*));
+//             int **cr_bloc = malloc(8 * sizeof(int*));
+//             for (int i = 0; i < 8; i++) {
+//                 cb_bloc[i] = malloc(8 * sizeof(int));
+//                 cr_bloc[i] = malloc(8 * sizeof(int));
+//             }
+
+//             quantification_inverse(Cb_blocs[mcu][b], image->Quant_Table[1]);
+//             quantification_inverse(Cr_blocs[mcu][b], image->Quant_Table[2]);
+//             inverse_zigzag(Cb_blocs[mcu][b], cb_bloc);
+//             inverse_zigzag(Cr_blocs[mcu][b], cr_bloc);
+
+//             unsigned char **cb_spatial, **cr_spatial;
+//             idct_ptr(cb_bloc, &cb_spatial);
+//             idct_ptr(cr_bloc, &cr_spatial);
+
+//             if (forbloc == 0) {
+//                 Cb_final[mcu][b] = cb_spatial;
+//                 Cr_final[mcu][b] = cr_spatial;
+//             } else if (forbloc == 1) {
+//                 up_sampling4_2_2(cb_spatial, cr_spatial, &Cb_final[mcu][b], &Cr_final[mcu][b]);
+//             } else if (forbloc == 2) {
+//                 up_sampling4_2_0(cb_spatial, cr_spatial, &Cb_final[mcu][b], &Cr_final[mcu][b]);
+//             }
+
+//             for (int i = 0; i < 8; i++) {
+//                 free(cb_bloc[i]);
+//                 free(cr_bloc[i]);
+//             }
+//             free(cb_bloc);
+//             free(cr_bloc);
+//         }
+//     }
+
+//     uint8_t **Y_matrix = malloc(image->Hauteur * sizeof(uint8_t *));
+//     for (int i = 0; i < image->Hauteur; i++) {
+//         Y_matrix[i] = malloc(image->Largeur * sizeof(uint8_t));
+//     }
+
+//     uint8_t **Cb_matrix = NULL;
+//     uint8_t **Cr_matrix = NULL;
+//     uint8_t **R_matrix = NULL;
+//     uint8_t **G_matrix = NULL;
+//     uint8_t **B_matrix = NULL;
+
+//     if (image->nb_components ==3) {
+//         Cb_matrix = malloc(image->Hauteur * sizeof(uint8_t *));
+//         Cr_matrix = malloc(image->Hauteur * sizeof(uint8_t *));
+//         R_matrix  = malloc(image->Hauteur * sizeof(uint8_t *));
+//         G_matrix  = malloc(image->Hauteur * sizeof(uint8_t *));
+//         B_matrix  = malloc(image->Hauteur * sizeof(uint8_t *));
+
+//         for (int i = 0; i < image->Hauteur; i++) {
+//             Cb_matrix[i] = malloc(image->Largeur * sizeof(uint8_t));
+//             Cr_matrix[i] = malloc(image->Largeur * sizeof(uint8_t));
+//             R_matrix[i]  = malloc(image->Largeur * sizeof(uint8_t));
+//             G_matrix[i]  = malloc(image->Largeur * sizeof(uint8_t));
+//             B_matrix[i]  = malloc(image->Largeur * sizeof(uint8_t));
+//         }    
+//     }
+
+//     remplir_YCbCr_matrices(Y_matrix, Cb_matrix, Cr_matrix, 
+//                        Y_final, Cb_final, Cr_final, 
+//                        image, nb_mcus_x, nb_mcus_y, 
+//                        H_Y, V_Y, H_C, V_C);
+
+//     IMAGE_D img_out;
+//     img_out.width = image->Largeur;
+//     img_out.height = image->Hauteur;
+//     img_out.colors =  (image->nb_components ==3)? 1 : 0;
+
+//     int total_pixels = img_out.width * img_out.height;
+//     img_out.R = malloc(total_pixels * sizeof(uint8_t));
+//     if (image->nb_components ==3) {
+//         img_out.G = malloc(total_pixels * sizeof(uint8_t));
+//         img_out.B = malloc(total_pixels * sizeof(uint8_t));
+//     } else {
+//         img_out.G = NULL;
+//         img_out.B = NULL;
+//     }
+
+//     if (image->nb_components ==3) {
+//         YCbCr_to_rgb(Y_matrix, Cb_matrix, Cr_matrix, R_matrix, G_matrix, B_matrix, image->Hauteur, image->Largeur);
+//         for (int i = 0; i < image->Hauteur; i++) {
+//             for (int j = 0; j < image->Largeur; j++) {
+//                 int index = i * image->Largeur + j;
+//                 img_out.R[index] = R_matrix[i][j];
+//                 img_out.G[index] = G_matrix[i][j];
+//                 img_out.B[index] = B_matrix[i][j];
+//             }
+//         }
+//     } else {
+//         for (int i = 0; i < image->Hauteur; i++) {
+//             for (int j = 0; j < image->Largeur; j++) {
+//                 int index = i * image->Largeur + j;
+//                 img_out.R[index] = Y_matrix[i][j];
+//             }
+//         }
+//     }
+
+    
+//     write_image("output.pnm", img_out);
+//     return 0;
+// }
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
@@ -282,200 +494,222 @@
 #include "upsampling.h"
 #include "ycbcr_rgb.h"
 
+void print_bloc(unsigned char **bloc, int mcu_index, int bloc_index, const char *component) {
+    printf("\n--- MCU #%d - Bloc #%d (%s) ---\n", mcu_index, bloc_index, component);
+    for (int i = 0; i < 8; i++) {
+        for (int j = 0; j < 8; j++) {
+            printf("%3d ", bloc[i][j]);
+        }
+        printf("\n");
+    }
+}
 
 int main(int argc, char* argv[]) {
-    if (argc != 2) {
-        printf("Usage: %s <input_file>\n", argv[0]);
-        return 1;
-    }
+    // if (argc != 2) {
+    //     printf("Usage: %s <input_file>\n", argv[0]);
+    //     return 1;
+    // }
 
-    IMAGE* image = read_jpeg(argv[1]);
+    IMAGE* image = read_jpeg("./images/invader.jpeg");
     if (!image) {
         fprintf(stderr, "Erreur de lecture du fichier JPEG.\n");
         return 2;
     }
-    // Vérifier les facteurs de sous-échantillonnage pour les composants Cb et Cr
-    int H_Y = image->COMPONENTS[0].h_factor;  
-    int V_Y = image->COMPONENTS[0].v_factor;
-    int H_C = image->COMPONENTS[1].h_factor;  
-    int V_C = image->COMPONENTS[1].v_factor;
 
-    int forbloc;
-    if (H_Y == H_C && V_Y == V_C) forbloc = 0;       // 4:4:4
-    else if (H_Y == 2 * H_C && V_Y == V_C) forbloc = 1;  // 4:2:2
-    else if (H_Y == 2 * H_C && V_Y == 2 * V_C) forbloc = 2; // 4:2:0
-    else {
-        fprintf(stderr, "Forbloc de sous-échantillonnage non supporté.\n");
-        return 3;
-    }
+    if (image->nb_components == 1){
+        size_t bit_pos = 0;
+        int dc_precedent = 0;
+        int bloc[64] = {0};
+        int nb_mcus_x = image->Largeur / 8;
+        int nb_mcus_y = image->Hauteur / 8;
+        int nbr_mcus = nb_mcus_x * nb_mcus_y;
 
-    // Dimensions en blocs
-    int nb_mcus_x = (image->Largeur  ) / (8 * H_Y);
-    int nb_mcus_y = (image->Hauteur ) / (8 * V_Y);
-    int total_mcus = nb_mcus_x * nb_mcus_y;
-    int nb_blocs_Y = H_Y * V_Y;
-    int nb_blocs_C = H_C * V_C;
+        for (int mcu = 0; mcu < nbr_mcus; mcu++) {
 
-    int ****Y_blocs, ****Cb_blocs = NULL, ****Cr_blocs = NULL;
-    size_t bit_pos = 0;
+            // Générer à nouveau les tables Huffman (au cas où elles changent dynamiquement)
+            char** huffman_dc = generer_codes_huffman(
+                image->HUFFMAN_tables[0].symbols,
+                image->HUFFMAN_tables[0].tailles,
+                image->HUFFMAN_tables[0].nb_symbols);
 
-    char** huffman_dc_Y = generer_codes_huffman(
-        image->HUFFMAN_tables[0].symbols,
-        image->HUFFMAN_tables[0].tailles,
-        image->HUFFMAN_tables[0].nb_symbols);
+            char** huffman_ac = generer_codes_huffman(
+                image->HUFFMAN_tables[2].symbols,
+                image->HUFFMAN_tables[2].tailles,
+                image->HUFFMAN_tables[2].nb_symbols);
 
-    char** huffman_ac_Y = generer_codes_huffman(
-        image->HUFFMAN_tables[2].symbols,
-        image->HUFFMAN_tables[2].tailles,
-        image->HUFFMAN_tables[2].nb_symbols);
-    char** huffman_dc_C = generer_codes_huffman(
-        image->HUFFMAN_tables[1].symbols,
-        image->HUFFMAN_tables[1].tailles,
-        image->HUFFMAN_tables[1].nb_symbols);
+            if (!huffman_dc || !huffman_ac) {
+                fprintf(stderr, "Erreur de génération des tables Huffman au MCU %d\n", mcu);
+                continue;
+            }
 
-    char** huffman_ac_C = generer_codes_huffman(
-        image->HUFFMAN_tables[3].symbols,
-        image->HUFFMAN_tables[3].tailles,
-        image->HUFFMAN_tables[3].nb_symbols);
+            // Décompression du bloc
+            decoder_bloc(
+                image->compressed_data, &bit_pos,
+                huffman_dc, image->HUFFMAN_tables[0].symbols, image->HUFFMAN_tables[0].nb_symbols,
+                huffman_ac, image->HUFFMAN_tables[2].symbols, image->HUFFMAN_tables[2].nb_symbols,
+                &dc_precedent, bloc);
 
-    // Extraction blocs DCT
-    extraire_bloc(
-        image->compressed_data, &bit_pos,
-        huffman_dc_Y, image->HUFFMAN_tables[0].symbols, image->HUFFMAN_tables[0].nb_symbols,
-        huffman_ac_Y, image->HUFFMAN_tables[2].symbols, image->HUFFMAN_tables[2].nb_symbols,
-        huffman_dc_C, image->HUFFMAN_tables[1].symbols, image->HUFFMAN_tables[1].nb_symbols,
-        huffman_ac_C, image->HUFFMAN_tables[3].symbols, image->HUFFMAN_tables[3].nb_symbols,
-        H_Y, H_C, V_Y, V_C,
-        image->Largeur, image->Hauteur,
-        &Y_blocs, &Cb_blocs, &Cr_blocs
-    );
+            printf("MCU %d - Bloc après décodage Huffman:\n", mcu + 1);
+            for (int i = 0; i < 64; i++) {
+                printf("%04hx ", (uint16_t)bloc[i]);
+                if ((i + 1) % 8 == 0) printf("\n");
+            }
 
-    unsigned char ****Y_final = malloc(total_mcus * sizeof(unsigned char***));
-    for (int mcu = 0; mcu < total_mcus; mcu++) {
-        Y_final[mcu] = malloc(nb_blocs_Y * sizeof(unsigned char**));
-        for (int b = 0; b < nb_blocs_Y; b++) {
-            int **Y_bloc = malloc(8 * sizeof(int*));
-            for (int i = 0; i < 8; i++) Y_bloc[i] = malloc(8 * sizeof(int));
+            quantification_inverse(bloc, image->Quant_Table[0]);
+            printf("Quantification inverse:\n");
+            for (int i = 0; i < 64; i++) {
+                printf("%04hx ", (uint16_t)bloc[i]);
+                if ((i + 1) % 8 == 0) printf("\n");
+            }
 
-            quantification_inverse(Y_blocs[mcu][b], image->Quant_Table[0]);
-            inverse_zigzag(Y_blocs[mcu][b], Y_bloc);
-            idct_ptr(Y_bloc, &Y_final[mcu][b]);
-
-            for (int i = 0; i < 8; i++) free(Y_bloc[i]);
-            free(Y_bloc);
-        }
-    }
-
-    
-    unsigned char ****Cb_final = malloc(total_mcus * sizeof(unsigned char***));
-    unsigned char ****Cr_final = malloc(total_mcus * sizeof(unsigned char***));
-
-    for (int mcu = 0; mcu < total_mcus; mcu++) {
-        Cb_final[mcu] = malloc(nb_blocs_C * sizeof(unsigned char**));
-        Cr_final[mcu] = malloc(nb_blocs_C * sizeof(unsigned char**));
-
-        for (int b = 0; b < nb_blocs_C; b++) {
-            int **cb_bloc = malloc(8 * sizeof(int*));
-            int **cr_bloc = malloc(8 * sizeof(int*));
+            int16_t** bloc_ap = malloc(8 * sizeof(int*));
             for (int i = 0; i < 8; i++) {
-                cb_bloc[i] = malloc(8 * sizeof(int));
-                cr_bloc[i] = malloc(8 * sizeof(int));
+                bloc_ap[i] = malloc(8 * sizeof(int));
             }
+            inverse_zigzag(bloc, bloc_ap);
 
-            quantification_inverse(Cb_blocs[mcu][b], image->Quant_Table[1]);
-            quantification_inverse(Cr_blocs[mcu][b], image->Quant_Table[2]);
-            inverse_zigzag(Cb_blocs[mcu][b], cb_bloc);
-            inverse_zigzag(Cr_blocs[mcu][b], cr_bloc);
-
-            unsigned char **cb_spatial, **cr_spatial;
-            idct_ptr(cb_bloc, &cb_spatial);
-            idct_ptr(cr_bloc, &cr_spatial);
-
-            if (forbloc == 0) {
-                Cb_final[mcu][b] = cb_spatial;
-                Cr_final[mcu][b] = cr_spatial;
-            } else if (forbloc == 1) {
-                up_sampling4_2_2(cb_spatial, cr_spatial, &Cb_final[mcu][b], &Cr_final[mcu][b]);
-            } else if (forbloc == 2) {
-                up_sampling4_2_0(cb_spatial, cr_spatial, &Cb_final[mcu][b], &Cr_final[mcu][b]);
-            }
-
+            printf("Inverse Zigzag:\n");
             for (int i = 0; i < 8; i++) {
-                free(cb_bloc[i]);
-                free(cr_bloc[i]);
+                for (int j = 0; j < 8; j++) {
+                    printf("%04hx ", (uint16_t)bloc_ap[i][j]);
+                }
+                printf("\n");
             }
-            free(cb_bloc);
-            free(cr_bloc);
+
+            unsigned char** spatial_block;
+            //idct_fast_asf_boi(bloc_ap, &spatial_block);
+            idct_ptr(bloc_ap, &spatial_block);
+            printf("IDCT:\n");
+            for (int i = 0; i < 8; i++) {
+                for (int j = 0; j < 8; j++) {
+                    printf("%04hx ", (unsigned char)spatial_block[i][j]);
+                }
+                printf("\n");
+            }
+
+            // Libérations
+            for (int i = 0; i < 8; i++) free(bloc_ap[i]);
+            free(bloc_ap);
+            free_huffman_table(huffman_dc, image->HUFFMAN_tables[0].nb_symbols);
+            free_huffman_table(huffman_ac, image->HUFFMAN_tables[2].nb_symbols);
         }
     }
+    // else{
+    //     int H_Y = image->COMPONENTS[0].h_factor;  
+    //     int V_Y = image->COMPONENTS[0].v_factor;
+    //     int H_C = image->COMPONENTS[1].h_factor;  
+    //     int V_C = image->COMPONENTS[1].v_factor;
 
-    uint8_t **Y_matrix = malloc(image->Hauteur * sizeof(uint8_t *));
-    for (int i = 0; i < image->Hauteur; i++) {
-        Y_matrix[i] = malloc(image->Largeur * sizeof(uint8_t));
-    }
+    //     int forbloc;
+    //     if (H_Y == H_C && V_Y == V_C) forbloc = 0;       // 4:4:4
+    //     else if (H_Y == 2 * H_C && V_Y == V_C) forbloc = 1;  // 4:2:2
+    //     else if (H_Y == 2 * H_C && V_Y == 2 * V_C) forbloc = 2; // 4:2:0
+    //     else {
+    //         fprintf(stderr, "Forbloc de sous-échantillonnage non supporté.\n");
+    //         return 3;
+    //     }
 
-    uint8_t **Cb_matrix = NULL;
-    uint8_t **Cr_matrix = NULL;
-    uint8_t **R_matrix = NULL;
-    uint8_t **G_matrix = NULL;
-    uint8_t **B_matrix = NULL;
+    //     int nb_mcus_x = image->Largeur / (8 * H_Y);
+    //     int nb_mcus_y = image->Hauteur / (8 * V_Y);
+    //     int total_mcus = nb_mcus_x * nb_mcus_y;
+    //     int nb_blocs_Y = H_Y * V_Y;
+    //     int nb_blocs_C = H_C * V_C;
 
-    if (image->nb_components ==3) {
-        Cb_matrix = malloc(image->Hauteur * sizeof(uint8_t *));
-        Cr_matrix = malloc(image->Hauteur * sizeof(uint8_t *));
-        R_matrix  = malloc(image->Hauteur * sizeof(uint8_t *));
-        G_matrix  = malloc(image->Hauteur * sizeof(uint8_t *));
-        B_matrix  = malloc(image->Hauteur * sizeof(uint8_t *));
+    //     // Allocation correcte pour les blocs à 4 niveaux de pointeurs
+    //     int ***Y_blocs = NULL, ***Cb_blocs = NULL, ***Cr_blocs = NULL;
+    //     size_t bit_pos = 0;
 
-        for (int i = 0; i < image->Hauteur; i++) {
-            Cb_matrix[i] = malloc(image->Largeur * sizeof(uint8_t));
-            Cr_matrix[i] = malloc(image->Largeur * sizeof(uint8_t));
-            R_matrix[i]  = malloc(image->Largeur * sizeof(uint8_t));
-            G_matrix[i]  = malloc(image->Largeur * sizeof(uint8_t));
-            B_matrix[i]  = malloc(image->Largeur * sizeof(uint8_t));
-        }    
-    }
+    //     // Génération des tables de Huffman pour DC et AC des composants Y et Cb, Cr
+    //     char** huffman_dc_Y = generer_codes_huffman(image->HUFFMAN_tables[0].symbols, image->HUFFMAN_tables[0].tailles, image->HUFFMAN_tables[0].nb_symbols);
+    //     char** huffman_ac_Y = generer_codes_huffman(image->HUFFMAN_tables[2].symbols, image->HUFFMAN_tables[2].tailles, image->HUFFMAN_tables[2].nb_symbols);
+    //     char** huffman_dc_C = generer_codes_huffman(image->HUFFMAN_tables[1].symbols, image->HUFFMAN_tables[1].tailles, image->HUFFMAN_tables[1].nb_symbols);
+    //     char** huffman_ac_C = generer_codes_huffman(image->HUFFMAN_tables[3].symbols, image->HUFFMAN_tables[3].tailles, image->HUFFMAN_tables[3].nb_symbols);
 
-    remplir_YCbCr_matrices(Y_matrix, Cb_matrix, Cr_matrix, 
-                       Y_final, Cb_final, Cr_final, 
-                       image, nb_mcus_x, nb_mcus_y, 
-                       H_Y, V_Y, H_C, V_C);
+    //     // Extraction des blocs pour Y, Cb et Cr
+    //     extraire_bloc(
+    //         image->compressed_data, &bit_pos,
+    //         huffman_dc_Y, image->HUFFMAN_tables[0].symbols, image->HUFFMAN_tables[0].nb_symbols,
+    //         huffman_ac_Y, image->HUFFMAN_tables[2].symbols, image->HUFFMAN_tables[2].nb_symbols,
+    //         huffman_dc_C, image->HUFFMAN_tables[1].symbols, image->HUFFMAN_tables[1].nb_symbols,
+    //         huffman_ac_C, image->HUFFMAN_tables[3].symbols, image->HUFFMAN_tables[3].nb_symbols,
+    //         H_Y, H_C, V_Y, V_C,
+    //         image->Largeur, image->Hauteur,
+    //         &Y_blocs, &Cb_blocs, &Cr_blocs
+    //     );
 
-    IMAGE_D img_out;
-    img_out.width = image->Largeur;
-    img_out.height = image->Hauteur;
-    img_out.colors =  (image->nb_components ==3)? 1 : 0;
+    //     //Décodage du composant Y
+    //     unsigned char ****Y_final = malloc(total_mcus * sizeof(unsigned char***));
+    //     for (int mcu = 0; mcu < total_mcus; mcu++) {
+    //         Y_final[mcu] = malloc(nb_blocs_Y * sizeof(unsigned char**));
+    //         for (int b = 0; b < nb_blocs_Y; b++) {
+    //             int **Y_bloc = malloc(8 * sizeof(int*));
+    //             for (int i = 0; i < 8; i++){
+    //                 Y_bloc[i] = malloc(8 * sizeof(int));
+    //             } 
+    //             quantification_inverse(Y_blocs[mcu][b], image->Quant_Table[0]);
+    //             inverse_zigzag(Y_blocs[mcu][b], Y_bloc);
+    //             idct_ptr(Y_bloc, &Y_final[mcu][b]);
+    //             print_bloc(Y_final[mcu][b], mcu, b, "Y");
 
-    int total_pixels = img_out.width * img_out.height;
-    img_out.R = malloc(total_pixels * sizeof(uint8_t));
-    if (image->nb_components ==3) {
-        img_out.G = malloc(total_pixels * sizeof(uint8_t));
-        img_out.B = malloc(total_pixels * sizeof(uint8_t));
-    } else {
-        img_out.G = NULL;
-        img_out.B = NULL;
-    }
+    //             for (int i = 0; i < 8; i++) {
+    //                 free(Y_bloc[i]);
+    //             }
+    //             free(Y_bloc);
+    //         }
+        
+    //     }
+    // }
+    // // Initialisation correcte de Cb_final et Cr_final
+    // if (image->nb_components == 3) {
+    //     unsigned char ****Cb_final = malloc(total_mcus * sizeof(unsigned char***));
+    //     unsigned char ****Cr_final = malloc(total_mcus * sizeof(unsigned char***));
 
-    if (image->nb_components ==3) {
-        YCbCr_to_rgb(Y_matrix, Cb_matrix, Cr_matrix, R_matrix, G_matrix, B_matrix, image->Hauteur, image->Largeur);
-        for (int i = 0; i < image->Hauteur; i++) {
-            for (int j = 0; j < image->Largeur; j++) {
-                int index = i * image->Largeur + j;
-                img_out.R[index] = R_matrix[i][j];
-                img_out.G[index] = G_matrix[i][j];
-                img_out.B[index] = B_matrix[i][j];
-            }
-        }
-    } else {
-        for (int i = 0; i < image->Hauteur; i++) {
-            for (int j = 0; j < image->Largeur; j++) {
-                int index = i * image->Largeur + j;
-                img_out.R[index] = Y_matrix[i][j];
-            }
-        }
-    }
+    //     for (int mcu = 0; mcu < total_mcus; mcu++) {
+    //         Cb_final[mcu] = malloc(nb_blocs_C * sizeof(unsigned char**));
+    //         Cr_final[mcu] = malloc(nb_blocs_C * sizeof(unsigned char**));
 
-    // Écriture de l'image
-    // write_image("output.ppm", img_out);
+    //         for (int b = 0; b < nb_blocs_C; b++) {
+    //             int **cb_bloc = malloc(8 * sizeof(int*));
+    //             int **cr_bloc = malloc(8 * sizeof(int*));
+    //             for (int i = 0; i < 8; i++) {
+    //                 cb_bloc[i] = malloc(8 * sizeof(int));
+    //                 cr_bloc[i] = malloc(8 * sizeof(int));
+    //             }
+
+    //             quantification_inverse(Cb_blocs[mcu][b], image->Quant_Table[1]);
+    //             quantification_inverse(Cr_blocs[mcu][b], image->Quant_Table[2]);
+    //             inverse_zigzag(Cb_blocs[mcu][b], cb_bloc);
+    //             inverse_zigzag(Cr_blocs[mcu][b], cr_bloc);
+
+    //             unsigned char **cb_spatial, **cr_spatial;
+    //             idct_ptr(cb_bloc, &cb_spatial);
+    //             idct_ptr(cr_bloc, &cr_spatial);
+
+    //             if (forbloc == 0) {
+    //                 Cb_final[mcu][b] = cb_spatial;
+    //                 Cr_final[mcu][b] = cr_spatial;
+    //             } else if (forbloc == 1) {
+    //                 up_sampling4_2_2(cb_spatial, cr_spatial, &Cb_final[mcu][b], &Cr_final[mcu][b]);
+    //             } else if (forbloc == 2) {
+    //                 up_sampling4_2_0(cb_spatial, cr_spatial, &Cb_final[mcu][b], &Cr_final[mcu][b]);
+    //             }
+
+    //             print_bloc(Cb_final[mcu][b], mcu, b, "Cb");
+    //             print_bloc(Cr_final[mcu][b], mcu, b, "Cr");
+
+    //             for (int i = 0; i < 8; i++) {
+    //                 free(cb_bloc[i]);
+    //                 free(cr_bloc[i]);
+    //             }
+    //             free(cb_bloc);
+    //             free(cr_bloc);
+    //         }
+    //     }
+    // }
+
+    // // Libération mémoire
+    // free(Y_final);
+ 
+
     return 0;
 }
