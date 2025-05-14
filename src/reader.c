@@ -44,6 +44,22 @@ IMAGE* init_image() {
     return img;
 }
 
+// function to free the image structure
+void free_image(IMAGE* img) {
+    if (img) {
+        if (img->COMMENTAIRE) {
+            free(img->COMMENTAIRE);
+        }
+        for (int i = 0; i < 4; i++) {
+            if (img->Quant_Table[i]) {
+                free(img->Quant_Table[i]);
+            }
+        }
+        free(img->compressed_data);
+        free(img);
+    }
+}
+
 // function to read the jpeg file
 IMAGE* read_jpeg(const char* file_name){
     BitStream* bs=bitstream_init(file_name);

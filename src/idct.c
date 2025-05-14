@@ -101,9 +101,11 @@ void idct_fast_asf_boi(int16_t **freq_block, unsigned char ***spatial_block) {
     double buff1[8], buff2[8];
     double tmp[8][8];
     double values[8];
-    *spatial_block = malloc(N * sizeof(unsigned char *));
-    for (int i = 0; i < 8; i++) {
-        (*spatial_block)[i] = malloc(N * sizeof(unsigned char));
+    if(*spatial_block==NULL){
+        *spatial_block = malloc(N * sizeof(unsigned char *));
+        for (int i = 0; i < 8; i++) {
+            (*spatial_block)[i] = malloc(N * sizeof(unsigned char));
+        }
     }
     for (int i = 0; i< 8; i++) {
         step1_idct(freq_block[i], buff1);

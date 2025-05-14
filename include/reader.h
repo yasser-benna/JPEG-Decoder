@@ -45,6 +45,7 @@ typedef struct IMAGE{
 
 // funtion to initialize the image structure
 IMAGE* init_image();
+void free_image(IMAGE* img); 
 // function to read the jpeg file
 IMAGE* read_jpeg(const char* file_name);
 
