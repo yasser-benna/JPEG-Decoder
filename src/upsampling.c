@@ -4,75 +4,55 @@
 #include <upsampling.h>
 #define N 8
 
-void up_sampling4_2_2_Cb(unsigned char**Cb,unsigned char ***new_Cb){
-    *new_Cb = malloc(N * sizeof(int*));
+void up_sampling4_2_2_horizontal(unsigned char**C,unsigned char ***new_C, int H_Y, int V_Y){
+    *new_C = malloc(N * V_Y * sizeof(int*));
     for (int i = 0; i < N; i++) {
-        (*new_Cb)[i] = malloc(2 * N * sizeof(int));
+        (*new_C)[i] = malloc(N * H_Y * sizeof(int));
         
     }
     for (int i = 0; i < N; i++) {
         for (int j = 0; j < N; j++) {
-            (*new_Cb)[i][2*j] = Cb[i][j];            
-            (*new_Cb)[i][2*j + 1] = Cb[i][j];
+            (*new_C)[i][2*j] = C[i][j];            
+            (*new_C)[i][2*j + 1] = C[i][j];
             
         }
     }   
 }
 
-void up_sampling4_2_2_Cr(unsigned char**Cr,unsigned char ***new_Cr){
-    *new_Cr = malloc(N * sizeof(int*));
+void up_sampling4_2_2_vertical(unsigned char**C,unsigned char ***new_C, int H_Y, int V_Y){
+    *new_C = malloc(V_Y * sizeof(int*));
     for (int i = 0; i < N; i++) {
-        (*new_Cr)[i] = malloc(2 * N * sizeof(int));
+        (*new_C)[i] = malloc(H_Y * N * sizeof(int));
         
     }
     for (int i = 0; i < N; i++) {
         for (int j = 0; j < N; j++) {
-            (*new_Cr)[i][2*j] = Cr[i][j];            
-            (*new_Cr)[i][2*j + 1] = Cr[i][j];
+            (*new_C)[2*i][j] = C[i][j];            
+            (*new_C)[2*i+1][j] = C[i][j];
             
         }
     }   
 }
 
 
-void up_sampling4_2_0_Cb(unsigned char**Cb, unsigned char ***new_Cb) {
-    *new_Cb = malloc(2 * N * sizeof(int *));
+void up_sampling4_2_0(unsigned char**C, unsigned char ***new_C, int H_Y, int V_Y) {
+    *new_C = malloc(V_Y * N * sizeof(int *));
     for (int i = 0; i < 2 * N; i++) {
-        (*new_Cb)[i] = malloc(2 * N * sizeof(int));
+        (*new_C)[i] = malloc(H_Y * N * sizeof(int));
     }
 
     for (int i = 0; i < N; i++) {
         for (int j = 0; j < N; j++) {
-            int val_cb = Cb[i][j];
+            int val_cb = C[i][j];
             
-            (*new_Cb)[2*i][2*j]     = val_cb;
-            (*new_Cb)[2*i][2*j+1]   = val_cb;
-            (*new_Cb)[2*i+1][2*j]   = val_cb;
-            (*new_Cb)[2*i+1][2*j+1] = val_cb;
+            (*new_C)[2*i][2*j]     = val_cb;
+            (*new_C)[2*i][2*j+1]   = val_cb;
+            (*new_C)[2*i+1][2*j]   = val_cb;
+            (*new_C)[2*i+1][2*j+1] = val_cb;
 
         }
     }
 }
-
-
-void up_sampling4_2_0_Cr(unsigned char **Cr, unsigned char ***new_Cr) {
-    *new_Cr = malloc(2 * N * sizeof(int *));
-    for (int i = 0; i < 2 * N; i++) {
-        (*new_Cr)[i] = malloc(2 * N * sizeof(int));
-    }
-
-    for (int i = 0; i < N; i++) {
-        for (int j = 0; j < N; j++) {
-            int val_cr = Cr[i][j];            
-            (*new_Cr)[2*i][2*j]     = val_cr;
-            (*new_Cr)[2*i][2*j+1]   = val_cr;
-            (*new_Cr)[2*i+1][2*j]   = val_cr;
-            (*new_Cr)[2*i+1][2*j+1] = val_cr;
-
-        }
-    }
-}
-
 
 
 
