@@ -9,6 +9,6 @@ typedef struct{
     int height;
     int colors;
 }IMAGE_D;
-void free_image(IMAGE_D* image);
+void free_image_d(IMAGE_D* image);
 void write_image(FILE*file,IMAGE_D image);
 IMAGE_D* init_image_d();

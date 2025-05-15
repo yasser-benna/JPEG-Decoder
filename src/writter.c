@@ -20,7 +20,7 @@ IMAGE_D* init_image_d(){
 
 
 
-void free_image(IMAGE_D* image){
+void free_image_d(IMAGE_D* image){
     if(image->R != NULL) {
         free(image->R);
     }
@@ -54,5 +54,5 @@ void write_image(FILE*file,IMAGE_D image){
         fprintf(file, "\n");
     }
     fprintf(file, "\n");
-    free_image(&image);
+    free_image_d(&image);
 }
