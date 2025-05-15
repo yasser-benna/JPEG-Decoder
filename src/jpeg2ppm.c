@@ -480,7 +480,8 @@
 //     return 0;
 // }
 
-#include <stdio.h>
+
+#include <math.h>
 #include <stdlib.h>
 #include <stdint.h>
 #include "writter.h"
@@ -620,15 +621,15 @@ int main(int argc, char* argv[]) {
                     return 3;
                 }
         
-            int nb_mcus_x = (image->Largeur+(image->Largeur)%(8*H_Y)) / (8 * H_Y);
-            int nb_mcus_y = (image->Hauteur+(image->Hauteur%(8*V_Y))) / (8 * V_Y);
+            int nb_mcus_x = (image->Largeur + 8 * H_Y - 1) / (8 * H_Y);
+            int nb_mcus_y = (image->Hauteur + 8 * V_Y - 1) / (8 * V_Y);
             int total_mcus = nb_mcus_x * nb_mcus_y;
             int nb_blocs_Y = H_Y * V_Y;
             int nb_blocs_Cr = H_Cr * V_Cr;
             int nb_blocs_Cb = H_Cb * V_Cb;
         
             // Allocation correcte pour les blocs à 4 niveaux de pointeurs
-            int ***Y_blocs = NULL, ***Cb_blocs = NULL, ***Cr_blocs = NULL;
+            int *** Y_blocs = NULL, ***Cb_blocs = NULL, ***Cr_blocs = NULL;
             size_t bit_pos = 0;
             // Extraction des blocs pour Y, Cb et Cr
             extraire_bloc(
