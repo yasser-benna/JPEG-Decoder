@@ -22,7 +22,7 @@ void YCbCr_to_rgb(unsigned char ***Y_blocks, unsigned char **Cb, unsigned char *
                 int global_ligne, global_colonne;
                 
                 if (sampling == 3) { // 4 2 0
-                    global_ligne = (int)(b / V_Y) * 8 * H_Y + ligne;
+                    global_ligne = (int)(b / V_Y) * 8 + ligne;
                     global_colonne = (b % H_Y) * 8 + colonne;
                 } 
                 else if (sampling == 1) { // 4 2 2 horizontal
@@ -51,106 +51,106 @@ void YCbCr_to_rgb(unsigned char ***Y_blocks, unsigned char **Cb, unsigned char *
 }
 
 
-int main() {
-    printf("\n=== Test 4:2:2 Horizontal ===\n");
-    unsigned char **R;
-    unsigned char **G;
-    unsigned char **B;
-    // Dimensions
-    int H_Y = 2, V_Y = 1;  // 1x2 blocs Y -> 8x16
-    int nb_blocks = H_Y * V_Y;  // 2 blocs 8x8
-    unsigned char ***Y_blocks;
-    unsigned char **Cr;
-    unsigned char **Cb;
+// int main() {
+//     printf("\n=== Test 4:2:2 Horizontal ===\n");
+//     unsigned char **R;
+//     unsigned char **G;
+//     unsigned char **B;
+//     // Dimensions
+//     int H_Y = 2, V_Y = 1;  // 1x2 blocs Y -> 8x16
+//     int nb_blocks = H_Y * V_Y;  // 2 blocs 8x8
+//     unsigned char ***Y_blocks;
+//     unsigned char **Cr;
+//     unsigned char **Cb;
 
-    // ===== Allocation mémoire =====
-    // Allocation pour Y_blocks[2][8][8]
-    Y_blocks = malloc(nb_blocks * sizeof(unsigned char **));
-    for (int b = 0; b < nb_blocks; b++) {
-        Y_blocks[b] = malloc(8 * sizeof(unsigned char *));
-        for (int i = 0; i < 8; i++) {
-            Y_blocks[b][i] = malloc(8 * sizeof(unsigned char));
-        }
-    }
+//     // ===== Allocation mémoire =====
+//     // Allocation pour Y_blocks[2][8][8]
+//     Y_blocks = malloc(nb_blocks * sizeof(unsigned char **));
+//     for (int b = 0; b < nb_blocks; b++) {
+//         Y_blocks[b] = malloc(8 * sizeof(unsigned char *));
+//         for (int i = 0; i < 8; i++) {
+//             Y_blocks[b][i] = malloc(8 * sizeof(unsigned char));
+//         }
+//     }
 
-    // Allocation pour Cb[8][8] et Cr[8][8]
-    Cb = malloc(8 * sizeof(unsigned char *));
-    Cr = malloc(8 * sizeof(unsigned char *));
-    for (int i = 0; i < 8; i++) {
-        Cb[i] = malloc(8 * sizeof(unsigned char));
-        Cr[i] = malloc(8 * sizeof(unsigned char));
-    }
+//     // Allocation pour Cb[8][8] et Cr[8][8]
+//     Cb = malloc(8 * sizeof(unsigned char *));
+//     Cr = malloc(8 * sizeof(unsigned char *));
+//     for (int i = 0; i < 8; i++) {
+//         Cb[i] = malloc(8 * sizeof(unsigned char));
+//         Cr[i] = malloc(8 * sizeof(unsigned char));
+//     }
 
-    // Allocation pour R[8][16], G[8][16], B[8][16]
-    R = malloc(8 * sizeof(unsigned char *));
-    G = malloc(8 * sizeof(unsigned char *));
-    B = malloc(8 * sizeof(unsigned char *));
-    for (int i = 0; i < 8; i++) {
-        R[i] = malloc(16 * sizeof(unsigned char));
-        G[i] = malloc(16 * sizeof(unsigned char));
-        B[i] = malloc(16 * sizeof(unsigned char));
-    }
+//     // Allocation pour R[8][16], G[8][16], B[8][16]
+//     R = malloc(8 * sizeof(unsigned char *));
+//     G = malloc(8 * sizeof(unsigned char *));
+//     B = malloc(8 * sizeof(unsigned char *));
+//     for (int i = 0; i < 8; i++) {
+//         R[i] = malloc(16 * sizeof(unsigned char));
+//         G[i] = malloc(16 * sizeof(unsigned char));
+//         B[i] = malloc(16 * sizeof(unsigned char));
+//     }
 
-    // ===== Remplissage avec des valeurs de test =====
-    for (int b = 0; b < nb_blocks; b++) {
-        for (int i = 0; i < 8; i++) {
-            for (int j = 0; j < 8; j++) {
-                Y_blocks[b][i][j] = 180;  // Y clair
-            }
-        }
-    }
+//     // ===== Remplissage avec des valeurs de test =====
+//     for (int b = 0; b < nb_blocks; b++) {
+//         for (int i = 0; i < 8; i++) {
+//             for (int j = 0; j < 8; j++) {
+//                 Y_blocks[b][i][j] = 180;  // Y clair
+//             }
+//         }
+//     }
     
-    for (int i = 0; i < 8; i++) {
-        for (int j = 0; j < 8; j++) {
-            Cb[i][j] = 120;  // Cb moyen
-            Cr[i][j] = 180;  // Cr élevé (rouge)
-        }
-    }
+//     for (int i = 0; i < 8; i++) {
+//         for (int j = 0; j < 8; j++) {
+//             Cb[i][j] = 120;  // Cb moyen
+//             Cr[i][j] = 180;  // Cr élevé (rouge)
+//         }
+//     }
     
-    // ===== Appel de la fonction =====
-    YCbCr_to_rgb(Y_blocks, Cb, Cr, &R, &G, &B, H_Y, V_Y, nb_blocks, 1);  // 1 = 4:2:2 horizontal
+//     // ===== Appel de la fonction =====
+//     YCbCr_to_rgb(Y_blocks, Cb, Cr, &R, &G, &B, H_Y, V_Y, nb_blocks, 1);  // 1 = 4:2:2 horizontal
     
-    // ===== Vérification =====
-    printf("R[0][0] = %d (attendu ~255)\n", R[0][0]);
-    printf("G[0][0] = %d (attendu ~150)\n", G[0][0]);
-    printf("B[0][0] = %d (attendu ~200)\n", B[0][0]);
-    for (int i = 0; i < 8 * V_Y; i++) {
-        for (int j = 0; j < 8* H_Y; j++) {
-            printf("%3d ", R[i][j]);
-        }
-        printf("\n");
-    }
+//     // ===== Vérification =====
+//     printf("R[0][0] = %d (attendu ~255)\n", R[0][0]);
+//     printf("G[0][0] = %d (attendu ~150)\n", G[0][0]);
+//     printf("B[0][0] = %d (attendu ~200)\n", B[0][0]);
+//     for (int i = 0; i < 8 * V_Y; i++) {
+//         for (int j = 0; j < 8* H_Y; j++) {
+//             printf("%3d ", R[i][j]);
+//         }
+//         printf("\n");
+//     }
     
-    // ===== Libération mémoire =====
-    // Libération de Y_blocks[2][8][8]
-    for (int b = 0; b < nb_blocks; b++) {
-        for (int i = 0; i < 8; i++) {
-            free(Y_blocks[b][i]);
-        }
-        free(Y_blocks[b]);
-    }
-    free(Y_blocks);
+//     // ===== Libération mémoire =====
+//     // Libération de Y_blocks[2][8][8]
+//     for (int b = 0; b < nb_blocks; b++) {
+//         for (int i = 0; i < 8; i++) {
+//             free(Y_blocks[b][i]);
+//         }
+//         free(Y_blocks[b]);
+//     }
+//     free(Y_blocks);
 
-    // Libération de Cb[8][8] et Cr[8][8]
-    for (int i = 0; i < 8; i++) {
-        free(Cb[i]);
-        free(Cr[i]);
-    }
-    free(Cb);
-    free(Cr);
+//     // Libération de Cb[8][8] et Cr[8][8]
+//     for (int i = 0; i < 8; i++) {
+//         free(Cb[i]);
+//         free(Cr[i]);
+//     }
+//     free(Cb);
+//     free(Cr);
 
-    // Libération de R[8][16], G[8][16], B[8][16]
-    for (int i = 0; i < 8; i++) {
-        free(R[i]);
-        free(G[i]);
-        free(B[i]);
-    }
-    free(R);
-    free(G);
-    free(B);
+//     // Libération de R[8][16], G[8][16], B[8][16]
+//     for (int i = 0; i < 8; i++) {
+//         free(R[i]);
+//         free(G[i]);
+//         free(B[i]);
+//     }
+//     free(R);
+//     free(G);
+//     free(B);
 
-    return 0;
-}
+//     return 0;
+// }
 
 
 

@@ -495,8 +495,8 @@
 #include "upsampling.h"
 #include "ycbcr_rgb.h"
 
-void print_bloc(unsigned char **bloc, int mcu_index, int bloc_index, const char *component,int H_Y,int V_Y) {
-    printf("\n--- MCU #%d - Bloc #%d (%s) ---\n", mcu_index, bloc_index, component);
+void print_bloc(unsigned char **bloc, int mcu_index, char * component, int H_Y, int V_Y) {
+    printf("\n--- MCU #%d -(%s) ---\n", mcu_index, component);
     for (int i = 0; i < 8*V_Y; i++) {
         for (int j = 0; j < 8*H_Y; j++) {
             printf("%4hx ", bloc[i][j]);
@@ -646,37 +646,34 @@ int main(int argc, char* argv[]) {
             
                 //Décodage du composant Y
                 unsigned char ****Y_final = malloc(total_mcus * sizeof(unsigned char***));
-                for (int mcu = 0; mcu < total_mcus; mcu++) {
-                        Y_final[mcu] = malloc(nb_blocs_Y * sizeof(unsigned char**));
-                        for (int b = 0; b < nb_blocs_Y; b++) {
-                                int16_t **Y_bloc = malloc(8 * sizeof(int*));
-                                for (int i = 0; i < 8; i++){
-                                        Y_bloc[i] = malloc(8 * sizeof(int));
-                                    } 
-                                    if (mcu==1080 && b==0 ){
-                                        printf("coila\n");
-                                    }
-                                    int* holder0=Y_blocs[mcu];
-                                    int holder1=Y_blocs[mcu][b];
-                                    uint8_t holder2= image->Quant_Table[0];
-                                    quantification_inverse(Y_blocs[mcu][b], image->Quant_Table[0]);
-                                    inverse_zigzag(Y_blocs[mcu][b], Y_bloc);
-                                    idct_ptr(Y_bloc, &Y_final[mcu][b]);
-                                    print_bloc(Y_final[mcu][b], mcu, b, "Y",1,1);
-                        
-                                    for (int i = 0; i < 8; i++) {
-                                            free(Y_bloc[i]);
-                                        }
-                                        free(Y_bloc);
-                                    }
-                            
-                                }
-                // Initialisation correcte de Cb_final et Cr_final
                 unsigned char ****Cb_final = malloc(total_mcus * sizeof(unsigned char***));
                 unsigned char ****Cr_final = malloc(total_mcus * sizeof(unsigned char***));
                 unsigned char **cb_spatial, **cr_spatial;
-            
+                unsigned char **R;
+                unsigned char **G;
+                unsigned char **B;
                 for (int mcu = 0; mcu < total_mcus; mcu++) {
+                    Y_final[mcu] = malloc(nb_blocs_Y * sizeof(unsigned char**));
+                    for (int b = 0; b < nb_blocs_Y; b++) {
+                            int16_t **Y_bloc = malloc(8 * sizeof(int*));
+                            for (int i = 0; i < 8; i++){
+                                    Y_bloc[i] = malloc(8 * sizeof(int));
+                                } 
+                                if (mcu==1080 && b==0 ){
+                                    printf("coila\n");
+                                }
+                                int* holder0=Y_blocs[mcu];
+                                int holder1=Y_blocs[mcu][b];
+                                uint8_t holder2= image->Quant_Table[0];
+                                quantification_inverse(Y_blocs[mcu][b], image->Quant_Table[0]);
+                                inverse_zigzag(Y_blocs[mcu][b], Y_bloc);
+                                idct_ptr(Y_bloc, &Y_final[mcu][b]);
+                    
+                                for (int i = 0; i < 8; i++) {
+                                        free(Y_bloc[i]);
+                                    }
+                                    free(Y_bloc);
+                                }
                     Cb_final[mcu] = malloc(nb_blocs_Cb * sizeof(unsigned char**));
                     Cr_final[mcu] = malloc(nb_blocs_Cr * sizeof(unsigned char**));
                     for (int b = 0; b < nb_blocs_Cb; b++) {
@@ -703,7 +700,7 @@ int main(int argc, char* argv[]) {
                         else{
                             up_sampling4_2_0(cb_spatial, &Cb_final[mcu][b], H_Y, V_Y);
                         }
-                        print_bloc(Cb_final[mcu][b],mcu,b,"Cb",H_Y,V_Y);
+
                         for (int i = 0; i < 8; i++) {
                             free(cb_bloc[i]);
                         }
@@ -731,13 +728,15 @@ int main(int argc, char* argv[]) {
                             up_sampling4_2_0(cr_spatial, &Cr_final[mcu][b], H_Y, V_Y);
                         }
 
-                        print_bloc(Cr_final[mcu][b],mcu,b,"Cr",H_Y,V_Y);
-
                         for (int i = 0; i < 8; i++) {
                             free(cr_bloc[i]);
                         }
                         free(cr_bloc);
                     }
+                    YCbCr_to_rgb(Y_final[mcu], Cb_final[mcu][0], Cr_final[mcu][0], &R, &G, &B, H_Y, V_Y, nb_blocs_Y, forbloc);
+                    print_bloc(R,mcu,"R",H_Y,V_Y);
+                    print_bloc(R,mcu,"G",H_Y,V_Y);
+                    print_bloc(R,mcu,"B",H_Y,V_Y);
                 }
     }
     
