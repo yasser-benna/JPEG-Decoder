@@ -611,9 +611,10 @@ int main(int argc, char* argv[]) {
                 char** huffman_ac_Y = generer_codes_huffman(image->HUFFMAN_tables[2].symbols, image->HUFFMAN_tables[2].tailles, image->HUFFMAN_tables[2].nb_symbols);
                 char** huffman_dc_C = generer_codes_huffman(image->HUFFMAN_tables[1].symbols, image->HUFFMAN_tables[1].tailles, image->HUFFMAN_tables[1].nb_symbols);
                 char** huffman_ac_C = generer_codes_huffman(image->HUFFMAN_tables[3].symbols, image->HUFFMAN_tables[3].tailles, image->HUFFMAN_tables[3].nb_symbols);
-                if (H_Y == H_Cr && H_Cb==H_Cr && V_Y == V_Cr && V_Cb==V_Cr) forbloc = 0;       // 4:4:4
-                else if (H_Y == 2 * H_Cr && H_Cb==H_Cr && V_Y == V_Cr && V_Cb==V_Cr) forbloc = 1;  // 4:2:2
-                else if (H_Y == 2 * H_Cr &&H_Cb==H_Cr && V_Y == 2 * V_Cr && V_Cb==V_Cr) forbloc = 2; // 4:2:0
+                if (H_Y == H_Cr && H_Cb==H_Cr && V_Y == V_Cr && V_Cb==V_Cr) forbloc = 0;       // 4:4:4 
+                else if (H_Y == 2 * H_Cr && V_Y == V_Cb && H_Cb==H_Cr && V_Y == V_Cr && V_Cb==V_Cr) forbloc = 1;
+                else if (H_Y == H_Cr && V_Y == 2 * V_Cb && H_Cb==H_Cr && V_Y == 2 * V_Cr && V_Cb==V_Cr) forbloc = 2;  // 4:2:2 ila kant V_Y==1 rah horizontale o ila kan l3kss verticale 
+                else if (H_Y == 2 * H_Cr &&H_Cb==H_Cr && V_Y == 2 * V_Cr && V_Cb==V_Cr) forbloc = 3; // 4:2:0
                 else {
                     fprintf(stderr, "Forbloc de sous-échantillonnage non supporté.\n");
                     return 3;
@@ -690,10 +691,13 @@ int main(int argc, char* argv[]) {
                             Cb_final[mcu][b] = cb_spatial;
                         }
                         else if (forbloc ==1) {
-                            up_sampling4_2_2_Cb(cb_spatial,&Cb_final[mcu][b]);
+                            up_sampling4_2_2_horizontal(cb_spatial,&Cb_final[mcu][b], H_Y, V_Y);
+                        }
+                        else if (forbloc == 2){
+                            up_sampling4_2_2_vertical(cb_spatial,&Cb_final[mcu][b], H_Y, V_Y);
                         }
                         else{
-                            up_sampling4_2_0_Cb(cb_spatial, &Cb_final[mcu][b]);
+                            up_sampling4_2_0(cb_spatial, &Cb_final[mcu][b], H_Y, V_Y);
                         }
                         print_bloc(Cb_final[mcu][b],mcu,b,"Cb",H_Y,V_Y);
                         for (int i = 0; i < 8; i++) {
@@ -714,10 +718,13 @@ int main(int argc, char* argv[]) {
                             Cr_final[mcu][b] = cr_spatial;
                         }
                         else if (forbloc ==1) {
-                            up_sampling4_2_2_Cr(cr_spatial,&Cr_final[mcu][b]);
+                            up_sampling4_2_2_horizontal(cr_spatial,&Cr_final[mcu][b], H_Y, V_Y);
+                        }
+                        else if (forbloc == 2){
+                            up_sampling4_2_2_vertical(cr_spatial, &Cr_final[mcu][b], H_Y, V_Y);
                         }
                         else{
-                            up_sampling4_2_0_Cr(cr_spatial, &Cr_final[mcu][b]);
+                            up_sampling4_2_0(cr_spatial, &Cr_final[mcu][b], H_Y, V_Y);
                         }
 
                         print_bloc(Cr_final[mcu][b],mcu,b,"Cr",H_Y,V_Y);
@@ -729,7 +736,7 @@ int main(int argc, char* argv[]) {
                     }
                 }
     }
-
+    
                     // if (forbloc == 0) {
                     //         Cb_final[mcu][b] = cb_spatial;
                     //         Cr_final[mcu][b] = cr_spatial;

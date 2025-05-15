@@ -3,5 +3,5 @@
 #include <stdio.h>
 
 void up_sampling4_2_2_horizontal( unsigned char **Cb, unsigned char ***new_Cb, int H_Y, int V_Y);
-void up_sampling4_2_2_Cr_vertical( unsigned char**Cr, unsigned char ***new_Cr, int H_Y, int V_Y);
-void up_sampling4_2_0_Cb( unsigned char**Cb, unsigned char***new_Cb);
+void up_sampling4_2_2_vertical( unsigned char**Cr, unsigned char ***new_Cr, int H_Y, int V_Y);
+void up_sampling4_2_0( unsigned char**Cb, unsigned char***new_Cb, int H_Y, int V_Y);
