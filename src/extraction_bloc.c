@@ -21,7 +21,7 @@ void extraire_bloc(const uint8_t *data, size_t *bit_pos,
     int mcu_height = V_Y * 8;
 
     int mcu_cols = (largeur_image+(largeur_image%mcu_width)) / mcu_width;
-    int mcu_rows = (hauteur_image+(largeur_image%mcu_height)) / mcu_height;
+    int mcu_rows = (hauteur_image+(hauteur_image%mcu_height)) / mcu_height;
     int total_mcus = mcu_cols * mcu_rows;
 
     int nb_blocs_Y = H_Y * V_Y;
