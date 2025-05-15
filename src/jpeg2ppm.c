@@ -683,6 +683,9 @@ int main(int argc, char* argv[]) {
                         for (int i = 0; i < 8; i++) {
                             cb_bloc[i] = malloc(8 * sizeof(int));
                         }
+                        int ** holder0=Cb_blocs[mcu];
+                        uint16_t* holder1=image->Quant_Table[1];
+
                         quantification_inverse(Cb_blocs[mcu][b], image->Quant_Table[1]);
                         inverse_zigzag(Cb_blocs[mcu][b], cb_bloc);
                         idct_ptr(cb_bloc,&cb_spatial);

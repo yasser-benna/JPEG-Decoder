@@ -63,6 +63,11 @@ void free_image(IMAGE* img) {
 // function to read the jpeg file
 IMAGE* read_jpeg(const char* file_name){
     BitStream* bs=bitstream_init(file_name);
+    if(bs==NULL){
+        printf("ERROR FILE OPEN\n");
+        exit(0);
+
+    }
     IMAGE*image=init_image();
     uint16_t MARQUEUR=0;
     read_soi(bs);

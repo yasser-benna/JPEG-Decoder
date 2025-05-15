@@ -6,7 +6,7 @@
 
 void up_sampling4_2_2_horizontal(unsigned char**C,unsigned char ***new_C, int H_Y, int V_Y){
     *new_C = malloc(N * V_Y * sizeof(int*));
-    for (int i = 0; i < N; i++) {
+    for (int i = 0; i < V_Y * N; i++) {
         (*new_C)[i] = malloc(N * H_Y * sizeof(int));
         
     }
@@ -20,13 +20,13 @@ void up_sampling4_2_2_horizontal(unsigned char**C,unsigned char ***new_C, int H_
 }
 
 void up_sampling4_2_2_vertical(unsigned char**C,unsigned char ***new_C, int H_Y, int V_Y){
-    *new_C = malloc(V_Y * sizeof(int*));
-    for (int i = 0; i < N; i++) {
+    *new_C = malloc(V_Y * N * sizeof(int*));
+    for (int i = 0; i < V_Y * N; i++) {
         (*new_C)[i] = malloc(H_Y * N * sizeof(int));
         
     }
     for (int i = 0; i < N; i++) {
-        for (int j = 0; j < N; j++) {
+        for (int j = 0; j <  N; j++) {
             (*new_C)[2*i][j] = C[i][j];            
             (*new_C)[2*i+1][j] = C[i][j];
             
@@ -37,11 +37,11 @@ void up_sampling4_2_2_vertical(unsigned char**C,unsigned char ***new_C, int H_Y,
 
 void up_sampling4_2_0(unsigned char**C, unsigned char ***new_C, int H_Y, int V_Y) {
     *new_C = malloc(V_Y * N * sizeof(int *));
-    for (int i = 0; i < 2 * N; i++) {
+    for (int i = 0; i < 2 * V_Y * N; i++) {
         (*new_C)[i] = malloc(H_Y * N * sizeof(int));
     }
 
-    for (int i = 0; i < N; i++) {
+    for (int i = 0; i <  N; i++) {
         for (int j = 0; j < N; j++) {
             int val_cb = C[i][j];
             
