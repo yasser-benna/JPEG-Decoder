@@ -686,7 +686,7 @@ int main(int argc, char* argv[]) {
                         quantification_inverse(Cb_blocs[mcu][b], image->Quant_Table[1]);
                         inverse_zigzag(Cb_blocs[mcu][b], cb_bloc);
                         idct_ptr(cb_bloc,&cb_spatial);
-                        
+                        // fucntion unifier 422 needed 
                         if (forbloc == 0) {
                             Cb_final[mcu][b] = cb_spatial;
                         }
