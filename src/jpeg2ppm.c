@@ -516,12 +516,12 @@ int main(int argc, char* argv[]) {
         fprintf(stderr, "Erreur de lecture du fichier JPEG.\n");
         return 2;
     }
-
+    IMAGE_D* image_d = init_image_d(image->Largeur, image->Hauteur, image->nb_components==3);
     size_t bit_pos = 0;
     int dc_precedent = 0;
     int bloc[64] = {0};
-    int nb_mcus_x = image->Largeur / 8;
-    int nb_mcus_y = image->Hauteur / 8;
+    int nb_mcus_x = (image->Largeur+7) / 8;
+    int nb_mcus_y = (image->Hauteur+7) / 8;
     int nbr_mcus = nb_mcus_x * nb_mcus_y;
     int16_t** bloc_ap = NULL;
     unsigned char** spatial_block = NULL;
@@ -550,44 +550,18 @@ int main(int argc, char* argv[]) {
                     huffman_dc, image->HUFFMAN_tables[0].symbols, image->HUFFMAN_tables[0].nb_symbols,
                     huffman_ac, image->HUFFMAN_tables[2].symbols, image->HUFFMAN_tables[2].nb_symbols,
                     &dc_precedent, bloc);
-                    
-                    printf("MCU %d - Bloc après décodage Huffman:\n", mcu + 1);
-                    for (int i = 0; i < 64; i++) {
-                        printf("%04hx ", (uint16_t)bloc[i]);
-                        if ((i + 1) % 8 == 0) printf("\n");
-                    }
-                    
+
                     quantification_inverse(bloc, image->Quant_Table[0]);
-                    printf("Quantification inverse:\n");
-                    for (int i = 0; i < 64; i++) {
-                        printf("%04hx ", (uint16_t)bloc[i]);
-                        if ((i + 1) % 8 == 0) printf("\n");
-                    }
-                    
+
                     bloc_ap = malloc(8 * sizeof(int*));
                     for (int i = 0; i < 8; i++) {
                         bloc_ap[i] = malloc(8 * sizeof(int));
                     }
                     inverse_zigzag(bloc, bloc_ap);
-                    
-                    printf("Inverse Zigzag:\n");
-                    for (int i = 0; i < 8; i++) {
-                        for (int j = 0; j < 8; j++) {
-                            printf("%04hx ", (uint16_t)bloc_ap[i][j]);
-                        }
-                        printf("\n");
-                    }
-                    
-                    
+                                        
                     idct_fast_asf_boi(bloc_ap, &spatial_block);
+                    copy_mcu_to_image(image_d, spatial_block, NULL, NULL, mcu, nb_mcus_x, 1, 1);
                     //idct_ptr(bloc_ap, &spatial_block);
-                    printf("IDCT:\n");
-                    for (int i = 0; i < 8; i++) {
-                        for (int j = 0; j < 8; j++) {
-                            printf("%04hx ", (unsigned char)spatial_block[i][j]);
-                        }
-                        printf("\n");
-                    }
                     
                     // Libérations
                     for (int i = 0; i < 8; i++) free(bloc_ap[i]);
@@ -659,12 +633,6 @@ int main(int argc, char* argv[]) {
                             for (int i = 0; i < 8; i++){
                                     Y_bloc[i] = malloc(8 * sizeof(int));
                                 } 
-                                if (mcu==1080 && b==0 ){
-                                    printf("coila\n");
-                                }
-                                int* holder0=Y_blocs[mcu];
-                                int holder1=Y_blocs[mcu][b];
-                                uint8_t holder2= image->Quant_Table[0];
                                 quantification_inverse(Y_blocs[mcu][b], image->Quant_Table[0]);
                                 inverse_zigzag(Y_blocs[mcu][b], Y_bloc);
                                 idct_ptr(Y_bloc, &Y_final[mcu][b]);
@@ -734,9 +702,7 @@ int main(int argc, char* argv[]) {
                         free(cr_bloc);
                     }
                     YCbCr_to_rgb(Y_final[mcu], Cb_final[mcu][0], Cr_final[mcu][0], &R, &G, &B, H_Y, V_Y, nb_blocs_Y, forbloc);
-                    print_bloc(R,mcu,"R",H_Y,V_Y);
-                    print_bloc(R,mcu,"G",H_Y,V_Y);
-                    print_bloc(R,mcu,"B",H_Y,V_Y);
+                    copy_mcu_to_image(image_d, R, G, B, mcu, nb_mcus_x, H_Y, V_Y);
                 }
     }
     
@@ -767,7 +733,12 @@ int main(int argc, char* argv[]) {
                                     
                                     // free spactial_block
     free(spatial_block);
+    FILE* file = fopen("output1.ppm", "w");
+    int flag=file==NULL;
+    write_image_d(file, *image_d);
+    fclose(file);
     free_image(image);
+    free_image_d(image_d);
     return 0;
 }
                             

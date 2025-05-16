@@ -57,7 +57,6 @@ char **generer_codes_huffman(uint8_t symbols[256], uint8_t taille[16], int n_sym
                 table_huffman[i][k] = ((code >> (longueur_code - 1 - k)) & 1) + '0';
             }
             table_huffman[i][longueur_code] = '\0';
-            printf("Symbole: %u, Code: %s\n", symbols[i], table_huffman[i]);
             i++;
             code++;
         }
@@ -149,7 +148,6 @@ void decoder_bloc(
         }
         uint32_t bits_ac = read_bits(data, bit_pos, taille);
         int valeur_ac = magnitude(taille, bits_ac);
-        printf("AC[%d] = %d (run=%d, size=%d, bits=0x%x)\n", j-1, valeur_ac, run, taille, bits_ac);
         bloc[j] = valeur_ac;
         j++;
     }
