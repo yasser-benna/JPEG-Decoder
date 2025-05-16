@@ -695,7 +695,6 @@ int main(int argc, char* argv[]) {
                         else{
                             up_sampling4_2_0(cr_spatial, &Cr_final[mcu][b], H_Y, V_Y);
                         }
-
                         for (int i = 0; i < 8; i++) {
                             free(cr_bloc[i]);
                         }

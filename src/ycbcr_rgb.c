@@ -30,7 +30,7 @@ void YCbCr_to_rgb(unsigned char ***Y_blocks, unsigned char **Cb, unsigned char *
                     global_colonne = (b % H_Y) * 8 + colonne;
                 } 
                 else { // 4 2 2 vertical
-                    global_ligne = (int)(b / V_Y) * 8 + ligne;
+                    global_ligne = (int)(b / H_Y) * 8 + ligne;
                     global_colonne = colonne;
                 }
 
