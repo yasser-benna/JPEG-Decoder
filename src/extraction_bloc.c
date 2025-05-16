@@ -2,10 +2,10 @@
 #include <stdlib.h> 
 #include <stdint.h>   
 #include <string.h> 
-#include "huffman.h"
-#include "bitsmanip.h"
-#include "extraction_bloc.h"
-#include "reader.h"
+#include "../include/huffman.h"
+#include "../include/bitsmanip.h"
+#include "../include/extraction_bloc.h"
+#include "../include/reader.h"
 
 
 void extraire_bloc(const uint8_t *data, size_t *bit_pos,

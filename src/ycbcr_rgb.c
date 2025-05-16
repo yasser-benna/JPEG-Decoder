@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
-#include "ycbcr_rgb.h"
-#include "reader.h"
+#include "../include/ycbcr_rgb.h"
+#include "../include/reader.h"
 
 void YCbCr_to_rgb(unsigned char ***Y_blocks, unsigned char **Cb, unsigned char **Cr, 
                  unsigned char ***R, unsigned char ***G, unsigned char ***B, 

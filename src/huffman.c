@@ -2,8 +2,8 @@
 #include <stdlib.h> 
 #include <stdint.h>   
 #include <string.h>  
-#include "huffman.h"
-#include "bitsmanip.h"
+#include "../include/huffman.h"
+#include "../include/bitsmanip.h"
 
 uint8_t read_bit(const uint8_t *data, size_t *bit_pos) {
     static size_t prev_byte_index = SIZE_MAX;

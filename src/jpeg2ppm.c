@@ -1,11 +1,11 @@
-// #include "huffman.h"
-// #include "bitsmanip.h"
-// #include "writter.h"
-// #include "reader.h"
-// #include "iqzz.h"
-// #include "zigzag.h"
-// #include "idct.h"
-// #include "ycbcr_rgb.h"
+// #include "../include/huffman.h"
+// #include "../include/bitsmanip.h"
+// #include "../include/writter.h"
+// #include "../include/reader.h"
+// #include "../include/iqzz.h"
+// #include "../include/zigzag.h"
+// #include "../include/idct.h"
+// #include "../include/ycbcr_rgb.h"
 // #include <stdio.h>
 // #include <stdlib.h>
 // #include <stdint.h>
@@ -50,7 +50,7 @@
 //         printf("\n");
 //     }
 //     unsigned char** spatial_block;
-//     idct_ptr(bloc_ap,&spatial_block);
+//     idct_fast_asf_boi(bloc_ap,&spatial_block);
 //     printf("IDCT:\n");
 //     for (int i = 0; i < 8; i++) {
 //         for (int j = 0; j < 8; j++) {
@@ -61,14 +61,14 @@
 //     return 0;
 // }
 
-// #include "huffman.h"
-// #include "bitsmanip.h"
-// #include "writter.h"
-// #include "reader.h"
-// #include "iqzz.h"
-// #include "zigzag.h"
-// #include "idct.h"
-// #include "ycbcr_rgb.h"
+// #include "../include/huffman.h"
+// #include "../include/bitsmanip.h"
+// #include "../include/writter.h"
+// #include "../include/reader.h"
+// #include "../include/iqzz.h"
+// #include "../include/zigzag.h"
+// #include "../include/idct.h"
+// #include "../include/ycbcr_rgb.h"
 // #include <stdio.h>
 // #include <stdlib.h>
 // #include <stdint.h>
@@ -140,7 +140,7 @@
 //             inverse_zigzag(bloc, bloc_ap);
 
 //             unsigned char** spatial_block;
-//             idct_ptr(bloc_ap, &spatial_block);
+//             idct_fast_asf_boi(bloc_ap, &spatial_block);
 
 //             // Affichage debug
 //             printf("--- composant %d ---\n", c);
@@ -156,14 +156,14 @@
 //     return 0;
 // }
 
-// #include "huffman.h"
-// #include "bitsmanip.h"
-// #include "writter.h"
-// #include "reader.h"
-// #include "iqzz.h"
-// #include "zigzag.h"
-// #include "idct.h"
-// #include "ycbcr_rgb.h"
+// #include "../include/huffman.h"
+// #include "../include/bitsmanip.h"
+// #include "../include/writter.h"
+// #include "../include/reader.h"
+// #include "../include/iqzz.h"
+// #include "../include/zigzag.h"
+// #include "../include/idct.h"
+// #include "../include/ycbcr_rgb.h"
 // #include <stdio.h>
 // #include <stdlib.h>
 // #include <stdint.h>
@@ -246,7 +246,7 @@
 //         }
 
 //         unsigned char** spatial_block;
-//         idct_ptr(bloc_ap, &spatial_block);
+//         idct_fast_asf_boi(bloc_ap, &spatial_block);
 
 //         printf("IDCT:\n");
 //         for (int i = 0; i < 8; i++) {
@@ -271,16 +271,16 @@
 // #include <stdio.h>
 // #include <stdlib.h>
 // #include <stdint.h>
-// #include "writter.h"
-// #include "reader.h"
-// #include "huffman.h"
-// #include "bitsmanip.h"
-// #include "extraction_bloc.h"
-// #include "iqzz.h"
-// #include "zigzag.h"
-// #include "idct.h"
-// #include "upsampling.h"
-// #include "ycbcr_rgb.h"
+// #include "../include/writter.h"
+// #include "../include/reader.h"
+// #include "../include/huffman.h"
+// #include "../include/bitsmanip.h"
+// #include "../include/extraction_bloc.h"
+// #include "../include/iqzz.h"
+// #include "../include/zigzag.h"
+// #include "../include/idct.h"
+// #include "../include/upsampling.h"
+// #include "../include/ycbcr_rgb.h"
 
 
 // int main(int argc, char* argv[]) {
@@ -359,7 +359,7 @@
 
 //             quantification_inverse(Y_blocs[mcu][b], image->Quant_Table[0]);
 //             inverse_zigzag(Y_blocs[mcu][b], Y_bloc);
-//             idct_ptr(Y_bloc, &Y_final[mcu][b]);
+//             idct_fast_asf_boi(Y_bloc, &Y_final[mcu][b]);
 
 //             for (int i = 0; i < 8; i++) free(Y_bloc[i]);
 //             free(Y_bloc);
@@ -388,8 +388,8 @@
 //             inverse_zigzag(Cr_blocs[mcu][b], cr_bloc);
 
 //             unsigned char **cb_spatial, **cr_spatial;
-//             idct_ptr(cb_bloc, &cb_spatial);
-//             idct_ptr(cr_bloc, &cr_spatial);
+//             idct_fast_asf_boi(cb_bloc, &cb_spatial);
+//             idct_fast_asf_boi(cr_bloc, &cr_spatial);
 
 //             if (forbloc == 0) {
 //                 Cb_final[mcu][b] = cb_spatial;
@@ -484,16 +484,16 @@
 #include <math.h>
 #include <stdlib.h>
 #include <stdint.h>
-#include "writter.h"
-#include "reader.h"
-#include "huffman.h"
-#include "bitsmanip.h"
-#include "extraction_bloc.h"
-#include "iqzz.h"
-#include "zigzag.h"
-#include "idct.h"
-#include "upsampling.h"
-#include "ycbcr_rgb.h"
+#include "../include/writter.h"
+#include "../include/reader.h"
+#include "../include/huffman.h"
+#include "../include/bitsmanip.h"
+#include "../include/extraction_bloc.h"
+#include "../include/iqzz.h"
+#include "../include/zigzag.h"
+#include "../include/idct.h"
+#include "../include/upsampling.h"
+#include "../include/ycbcr_rgb.h"
 
 void print_bloc(unsigned char **bloc, int mcu_index, char * component, int H_Y, int V_Y) {
     printf("\n--- MCU #%d -(%s) ---\n", mcu_index, component);
@@ -559,9 +559,9 @@ int main(int argc, char* argv[]) {
                     }
                     inverse_zigzag(bloc, bloc_ap);
                                         
-                    idct_fast_asf_boi(bloc_ap, &spatial_block);
+                    idct_fast(bloc_ap, &spatial_block);
                     copy_mcu_to_image(image_d, spatial_block, NULL, NULL, mcu, nb_mcus_x, 1, 1);
-                    //idct_ptr(bloc_ap, &spatial_block);
+                    //idct_fast_asf_boi(bloc_ap, &spatial_block);
                     
                     // Libérations
                     for (int i = 0; i < 8; i++) free(bloc_ap[i]);
@@ -635,7 +635,7 @@ int main(int argc, char* argv[]) {
                                 } 
                                 quantification_inverse(Y_blocs[mcu][b], image->Quant_Table[0]);
                                 inverse_zigzag(Y_blocs[mcu][b], Y_bloc);
-                                idct_ptr(Y_bloc, &Y_final[mcu][b]);
+                                idct_fast(Y_bloc, &Y_final[mcu][b]);
                     
                                 for (int i = 0; i < 8; i++) {
                                         free(Y_bloc[i]);
@@ -654,7 +654,7 @@ int main(int argc, char* argv[]) {
 
                         quantification_inverse(Cb_blocs[mcu][b], image->Quant_Table[1]);
                         inverse_zigzag(Cb_blocs[mcu][b], cb_bloc);
-                        idct_ptr(cb_bloc,&cb_spatial);
+                        idct_fast(cb_bloc,&cb_spatial);
                         // fucntion unifier 422 needed 
                         if (forbloc == 0) {
                             Cb_final[mcu][b] = cb_spatial;
@@ -681,7 +681,7 @@ int main(int argc, char* argv[]) {
                             }
                         quantification_inverse(Cr_blocs[mcu][b], image->Quant_Table[1]);
                         inverse_zigzag(Cr_blocs[mcu][b], cr_bloc);
-                        idct_ptr(cr_bloc, &cr_spatial);
+                        idct_fast(cr_bloc, &cr_spatial);
                         
                         if (forbloc == 0) {
                             Cr_final[mcu][b] = cr_spatial;

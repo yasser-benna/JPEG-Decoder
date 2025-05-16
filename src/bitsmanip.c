@@ -1,6 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
-#include "bitsmanip.h"
+#include "../include/bitsmanip.h"
 
 
 // Function to initialize a BitStream structure

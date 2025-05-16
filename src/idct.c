@@ -2,7 +2,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
-// #include "idct.h"
+#include "idct.h"
 #define N 8
 #define PI 3.14159265358979323846
 #define INV_SQRT2 0.7071067811865476
@@ -91,7 +91,7 @@ void step4_idct(double x[8], double y[8]){
     y[7] = (x[0] - x[7]) / 2;
 }
 
-void idct_fast_asf_boi(int16_t **freq_block, unsigned char ***spatial_block) {
+void idct_fast(int16_t **freq_block, unsigned char ***spatial_block) {
     double c6_1 = cos(3*PI/8);
     double c6_2 = sin(3*PI/8);
     double c3_1 = cos(3*PI/16);
@@ -101,19 +101,18 @@ void idct_fast_asf_boi(int16_t **freq_block, unsigned char ***spatial_block) {
     double buff1[8], buff2[8];
     double tmp[8][8];
     double values[8];
-    if(*spatial_block==NULL){
-        *spatial_block = malloc(N * sizeof(unsigned char *));
-        for (int i = 0; i < 8; i++) {
-            (*spatial_block)[i] = malloc(N * sizeof(unsigned char));
+    *spatial_block = malloc(N * sizeof(unsigned char *));
+    for (int i = 0; i < 8; i++) {
+        (*spatial_block)[i] = malloc(N * sizeof(unsigned char));
         }
-    }
     for (int i = 0; i< 8; i++) {
         step1_idct(freq_block[i], buff1);
         step2_idct(buff1, buff2, c6_1, c6_2);
         step3_idct(buff2, buff1, c1_1, c1_2, c3_1, c3_2);
         step4_idct(buff1, buff2);
-        for (int j = 0; j < 8; j++)
+        for (int j = 0; j < 8; j++){
             tmp[i][j] = buff2[j];
+        }
     }
     for (int j = 0; j < 8; j++) {
         for (int i = 0; i < 8; i++){

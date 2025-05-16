@@ -1,5 +1,5 @@
-#include "bitsmanip.h"
-#include "reader.h"
+#include "../include/bitsmanip.h"
+#include "../include/reader.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdint.h>

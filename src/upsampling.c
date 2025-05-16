@@ -1,7 +1,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include <upsampling.h>
+#include "../include/upsampling.h"
 #define N 8
 
 void up_sampling4_2_2_horizontal(unsigned char**C,unsigned char ***new_C, int H_Y, int V_Y){
