@@ -6,9 +6,9 @@
 
 //Up_sampling 4:2:2 horizontal
 void up_sampling4_2_2_horizontal(uint8_t **C, uint8_t ***new_C, int H_Y, int V_Y){
-    *new_C = malloc(N * V_Y * sizeof(int*));
+    *new_C = malloc(N * V_Y * sizeof(uint8_t*));
     for (int i = 0; i < V_Y * N; i++) {
-        (*new_C)[i] = malloc(N * H_Y * sizeof(int));
+        (*new_C)[i] = malloc(N * H_Y * sizeof(uint8_t));
         
     }
     for (int i = 0; i < N; i++) {
@@ -22,9 +22,9 @@ void up_sampling4_2_2_horizontal(uint8_t **C, uint8_t ***new_C, int H_Y, int V_Y
 
 //Up_sampling 4:2:2 vertical
 void up_sampling4_2_2_vertical(uint8_t**C,uint8_t ***new_C, int H_Y, int V_Y){
-    *new_C = malloc(V_Y * N * sizeof(int*));
+    *new_C = malloc(V_Y * N * sizeof(uint8_t*));
     for (int i = 0; i < V_Y * N; i++) {
-        (*new_C)[i] = malloc(H_Y * N * sizeof(int));
+        (*new_C)[i] = malloc(H_Y * N * sizeof(uint8_t));
         
     }
     for (int i = 0; i < N; i++) {
@@ -38,19 +38,17 @@ void up_sampling4_2_2_vertical(uint8_t**C,uint8_t ***new_C, int H_Y, int V_Y){
 
 //Up_sampling 4:2:0
 void up_sampling4_2_0(uint8_t **C, uint8_t ***new_C, int H_Y, int V_Y) {
-    *new_C = malloc(V_Y * N * sizeof(int *));
-    for (int i = 0; i < 2 * V_Y * N; i++) {
-        (*new_C)[i] = malloc(H_Y * N * sizeof(int));
+    *new_C = malloc(V_Y * N * sizeof(uint8_t *));
+    for (int i = 0; i < V_Y * N; i++) {
+        (*new_C)[i] = malloc(H_Y * N * sizeof(uint8_t));
     }
 
     for (int i = 0; i <  N; i++) {
         for (int j = 0; j < N; j++) {
-            int val_cb = C[i][j];
-            
-            (*new_C)[2*i][2*j]     = val_cb;
-            (*new_C)[2*i][2*j+1]   = val_cb;
-            (*new_C)[2*i+1][2*j]   = val_cb;
-            (*new_C)[2*i+1][2*j+1] = val_cb;
+            (*new_C)[2*i][2*j]     = C[i][j];
+            (*new_C)[2*i][2*j+1]   = C[i][j];
+            (*new_C)[2*i+1][2*j]   = C[i][j];
+            (*new_C)[2*i+1][2*j+1] = C[i][j];
 
         }
     }
@@ -135,12 +133,12 @@ void up_sampling4_2_0(uint8_t **C, uint8_t ***new_C, int H_Y, int V_Y) {
 
 //     for (int i = 0; i < N; i++) {
 //         for (int j = 0; j < N; j++) {
-//             int val_cb = Cb[i][j];
+//             int C[i][j] = Cb[i][j];
 //             int val_cr = Cr[i][j];
-//             (*new_Cb)[2*i][2*j]     = val_cb;
-//             (*new_Cb)[2*i][2*j+1]   = val_cb;
-//             (*new_Cb)[2*i+1][2*j]   = val_cb;
-//             (*new_Cb)[2*i+1][2*j+1] = val_cb;
+//             (*new_Cb)[2*i][2*j]     = C[i][j];
+//             (*new_Cb)[2*i][2*j+1]   = C[i][j];
+//             (*new_Cb)[2*i+1][2*j]   = C[i][j];
+//             (*new_Cb)[2*i+1][2*j+1] = C[i][j];
 
 //             (*new_Cr)[2*i][2*j]     = val_cr;
 //             (*new_Cr)[2*i][2*j+1]   = val_cr;
