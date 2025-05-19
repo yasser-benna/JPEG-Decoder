@@ -49,7 +49,7 @@
 //         }
 //         printf("\n");
 //     }
-//     unsigned char** spatial_block;
+//     uint8_t** spatial_block;
 //     idct_fast_asf_boi(bloc_ap,&spatial_block);
 //     printf("IDCT:\n");
 //     for (int i = 0; i < 8; i++) {
@@ -139,7 +139,7 @@
 //             }
 //             inverse_zigzag(bloc, bloc_ap);
 
-//             unsigned char** spatial_block;
+//             uint8_t** spatial_block;
 //             idct_fast_asf_boi(bloc_ap, &spatial_block);
 
 //             // Affichage debug
@@ -245,7 +245,7 @@
 //             printf("\n");
 //         }
 
-//         unsigned char** spatial_block;
+//         uint8_t** spatial_block;
 //         idct_fast_asf_boi(bloc_ap, &spatial_block);
 
 //         printf("IDCT:\n");
@@ -350,9 +350,9 @@
 //         &Y_blocs, &Cb_blocs, &Cr_blocs
 //     );
 
-//     unsigned char ****Y_final = malloc(total_mcus * sizeof(unsigned char***));
+//     uint8_t ****Y_final = malloc(total_mcus * sizeof(uint8_t***));
 //     for (int mcu = 0; mcu < total_mcus; mcu++) {
-//         Y_final[mcu] = malloc(nb_blocs_Y * sizeof(unsigned char**));
+//         Y_final[mcu] = malloc(nb_blocs_Y * sizeof(uint8_t**));
 //         for (int b = 0; b < nb_blocs_Y; b++) {
 //             int **Y_bloc = malloc(8 * sizeof(int*));
 //             for (int i = 0; i < 8; i++) Y_bloc[i] = malloc(8 * sizeof(int));
@@ -367,12 +367,12 @@
 //     }
 
     
-//     unsigned char ****Cb_final = malloc(total_mcus * sizeof(unsigned char***));
-//     unsigned char ****Cr_final = malloc(total_mcus * sizeof(unsigned char***));
+//     uint8_t ****Cb_final = malloc(total_mcus * sizeof(uint8_t***));
+//     uint8_t ****Cr_final = malloc(total_mcus * sizeof(uint8_t***));
 
 //     for (int mcu = 0; mcu < total_mcus; mcu++) {
-//         Cb_final[mcu] = malloc(nb_blocs_C * sizeof(unsigned char**));
-//         Cr_final[mcu] = malloc(nb_blocs_C * sizeof(unsigned char**));
+//         Cb_final[mcu] = malloc(nb_blocs_C * sizeof(uint8_t**));
+//         Cr_final[mcu] = malloc(nb_blocs_C * sizeof(uint8_t**));
 
 //         for (int b = 0; b < nb_blocs_C; b++) {
 //             int **cb_bloc = malloc(8 * sizeof(int*));
@@ -387,7 +387,7 @@
 //             inverse_zigzag(Cb_blocs[mcu][b], cb_bloc);
 //             inverse_zigzag(Cr_blocs[mcu][b], cr_bloc);
 
-//             unsigned char **cb_spatial, **cr_spatial;
+//             uint8_t **cb_spatial, **cr_spatial;
 //             idct_fast_asf_boi(cb_bloc, &cb_spatial);
 //             idct_fast_asf_boi(cr_bloc, &cr_spatial);
 
@@ -495,7 +495,7 @@
 #include "../include/upsampling.h"
 #include "../include/ycbcr_rgb.h"
 
-void print_bloc(unsigned char **bloc, int mcu_index, char * component, int H_Y, int V_Y) {
+void print_bloc(uint8_t **bloc, int mcu_index, char * component, int H_Y, int V_Y) {
     printf("\n--- MCU #%d -(%s) ---\n", mcu_index, component);
     for (int i = 0; i < 8*V_Y; i++) {
         for (int j = 0; j < 8*H_Y; j++) {
@@ -524,7 +524,7 @@ int main(int argc, char* argv[]) {
     int nb_mcus_y = (image->Hauteur+7) / 8;
     int nbr_mcus = nb_mcus_x * nb_mcus_y;
     int16_t** bloc_ap = NULL;
-    unsigned char** spatial_block = NULL;
+    uint8_t** spatial_block = NULL;
     if (image->nb_components == 1){
         // Générer à nouveau les tables Huffman (au cas où elles changent dynamiquement)
         char** huffman_dc = generer_codes_huffman(
@@ -559,7 +559,7 @@ int main(int argc, char* argv[]) {
                     }
                     inverse_zigzag(bloc, bloc_ap);
                                         
-                    idct_fast(bloc_ap, &spatial_block);
+                    idct_rapide(bloc_ap, &spatial_block);
                     copy_mcu_to_image(image_d, spatial_block, NULL, NULL, mcu, nb_mcus_x, 1, 1);
                     //idct_fast_asf_boi(bloc_ap, &spatial_block);
                     
@@ -619,15 +619,15 @@ int main(int argc, char* argv[]) {
             
             
                 //Décodage du composant Y
-                unsigned char ****Y_final = malloc(total_mcus * sizeof(unsigned char***));
-                unsigned char ****Cb_final = malloc(total_mcus * sizeof(unsigned char***));
-                unsigned char ****Cr_final = malloc(total_mcus * sizeof(unsigned char***));
-                unsigned char **cb_spatial, **cr_spatial;
-                unsigned char **R;
-                unsigned char **G;
-                unsigned char **B;
+                uint8_t ****Y_final = malloc(total_mcus * sizeof(uint8_t***));
+                uint8_t ****Cb_final = malloc(total_mcus * sizeof(uint8_t***));
+                uint8_t ****Cr_final = malloc(total_mcus * sizeof(uint8_t***));
+                uint8_t **cb_spatial, **cr_spatial;
+                uint8_t **R;
+                uint8_t **G;
+                uint8_t **B;
                 for (int mcu = 0; mcu < total_mcus; mcu++) {
-                    Y_final[mcu] = malloc(nb_blocs_Y * sizeof(unsigned char**));
+                    Y_final[mcu] = malloc(nb_blocs_Y * sizeof(uint8_t**));
                     for (int b = 0; b < nb_blocs_Y; b++) {
                             int16_t **Y_bloc = malloc(8 * sizeof(int*));
                             for (int i = 0; i < 8; i++){
@@ -635,15 +635,15 @@ int main(int argc, char* argv[]) {
                                 } 
                                 quantification_inverse(Y_blocs[mcu][b], image->Quant_Table[0]);
                                 inverse_zigzag(Y_blocs[mcu][b], Y_bloc);
-                                idct_fast(Y_bloc, &Y_final[mcu][b]);
+                                idct_rapide(Y_bloc, &Y_final[mcu][b]);
                     
                                 for (int i = 0; i < 8; i++) {
                                         free(Y_bloc[i]);
                                     }
                                     free(Y_bloc);
                                 }
-                    Cb_final[mcu] = malloc(nb_blocs_Cb * sizeof(unsigned char**));
-                    Cr_final[mcu] = malloc(nb_blocs_Cr * sizeof(unsigned char**));
+                    Cb_final[mcu] = malloc(nb_blocs_Cb * sizeof(uint8_t**));
+                    Cr_final[mcu] = malloc(nb_blocs_Cr * sizeof(uint8_t**));
                     for (int b = 0; b < nb_blocs_Cb; b++) {
                         int16_t **cb_bloc = malloc(8 * sizeof(int*));
                         for (int i = 0; i < 8; i++) {
@@ -654,7 +654,7 @@ int main(int argc, char* argv[]) {
 
                         quantification_inverse(Cb_blocs[mcu][b], image->Quant_Table[1]);
                         inverse_zigzag(Cb_blocs[mcu][b], cb_bloc);
-                        idct_fast(cb_bloc,&cb_spatial);
+                        idct_rapide(cb_bloc,&cb_spatial);
                         // fucntion unifier 422 needed 
                         if (forbloc == 0) {
                             Cb_final[mcu][b] = cb_spatial;
@@ -681,7 +681,7 @@ int main(int argc, char* argv[]) {
                             }
                         quantification_inverse(Cr_blocs[mcu][b], image->Quant_Table[1]);
                         inverse_zigzag(Cr_blocs[mcu][b], cr_bloc);
-                        idct_fast(cr_bloc, &cr_spatial);
+                        idct_rapide(cr_bloc, &cr_spatial);
                         
                         if (forbloc == 0) {
                             Cr_final[mcu][b] = cr_spatial;

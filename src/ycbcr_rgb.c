@@ -7,18 +7,18 @@
 /*La fonction YCbCr_to_rgb permet la conversion de YCbCr en RGB en se basant sur les formules simplifiées fournies. Sans
 oublier également les conditions de saturation.*/
 
-void YCbCr_to_rgb(unsigned char ***Y_blocks, unsigned char **Cb, unsigned char **Cr, 
-                 unsigned char ***R, unsigned char ***G, unsigned char ***B, 
+void YCbCr_to_rgb(uint8_t ***Y_blocks, uint8_t **Cb, uint8_t **Cr, 
+                 uint8_t ***R, uint8_t ***G, uint8_t ***B, 
                  int H_Y, int V_Y, int nb_blocks, int sampling) {
 
     //  Allocation mémoire 
-    *R = malloc(8 * V_Y * sizeof(unsigned char*));
-    *G = malloc(8 * V_Y * sizeof(unsigned char*));
-    *B = malloc(8 * V_Y * sizeof(unsigned char*));
+    *R = malloc(8 * V_Y * sizeof(uint8_t*));
+    *G = malloc(8 * V_Y * sizeof(uint8_t*));
+    *B = malloc(8 * V_Y * sizeof(uint8_t*));
     for (int i = 0; i < 8 * V_Y; i++){
-        (*R)[i] = malloc(8 * H_Y * sizeof(unsigned char*));
-        (*G)[i] = malloc(8 * H_Y * sizeof(unsigned char*));
-        (*B)[i] = malloc(8 * H_Y * sizeof(unsigned char*));
+        (*R)[i] = malloc(8 * H_Y * sizeof(uint8_t*));
+        (*G)[i] = malloc(8 * H_Y * sizeof(uint8_t*));
+        (*B)[i] = malloc(8 * H_Y * sizeof(uint8_t*));
     }
     
     for (int i = 0; i < nb_blocks; i++) {
@@ -39,9 +39,9 @@ void YCbCr_to_rgb(unsigned char ***Y_blocks, unsigned char **Cb, unsigned char *
                     global_colonne = colonne;
                 }
 
-                unsigned char Y = Y_blocks[i][ligne][colonne];
-                unsigned char cb = Cb[global_ligne][global_colonne];
-                unsigned char cr = Cr[global_ligne][global_colonne];
+                uint8_t Y = Y_blocks[i][ligne][colonne];
+                uint8_t cb = Cb[global_ligne][global_colonne];
+                uint8_t cr = Cr[global_ligne][global_colonne];
 
                 // Utilisation des formules de conversion 
                 int r = Y + 1.402 * (cr - 128);
@@ -57,45 +57,45 @@ void YCbCr_to_rgb(unsigned char ***Y_blocks, unsigned char **Cb, unsigned char *
     }
 }
 
-
+//Test de YCbCr to RGB
 // int main() {
 //     printf("\n=== Test 4:2:2 Horizontal ===\n");
-//     unsigned char **R;
-//     unsigned char **G;
-//     unsigned char **B;
+//     uint8_t **R;
+//     uint8_t **G;
+//     uint8_t **B;
 //     // Dimensions
 //     int H_Y = 2, V_Y = 1;  // 1x2 blocs Y -> 8x16
 //     int nb_blocks = H_Y * V_Y;  // 2 blocs 8x8
-//     unsigned char ***Y_blocks;
-//     unsigned char **Cr;
-//     unsigned char **Cb;
+//     uint8_t ***Y_blocks;
+//     uint8_t **Cr;
+//     uint8_t **Cb;
 
 //     // ===== Allocation mémoire =====
 //     // Allocation pour Y_blocks[2][8][8]
-//     Y_blocks = malloc(nb_blocks * sizeof(unsigned char **));
+//     Y_blocks = malloc(nb_blocks * sizeof(uint8_t **));
 //     for (int b = 0; b < nb_blocks; b++) {
-//         Y_blocks[b] = malloc(8 * sizeof(unsigned char *));
+//         Y_blocks[b] = malloc(8 * sizeof(uint8_t *));
 //         for (int i = 0; i < 8; i++) {
-//             Y_blocks[b][i] = malloc(8 * sizeof(unsigned char));
+//             Y_blocks[b][i] = malloc(8 * sizeof(uint8_t));
 //         }
 //     }
 
 //     // Allocation pour Cb[8][8] et Cr[8][8]
-//     Cb = malloc(8 * sizeof(unsigned char *));
-//     Cr = malloc(8 * sizeof(unsigned char *));
+//     Cb = malloc(8 * sizeof(uint8_t *));
+//     Cr = malloc(8 * sizeof(uint8_t *));
 //     for (int i = 0; i < 8; i++) {
-//         Cb[i] = malloc(8 * sizeof(unsigned char));
-//         Cr[i] = malloc(8 * sizeof(unsigned char));
+//         Cb[i] = malloc(8 * sizeof(uint8_t));
+//         Cr[i] = malloc(8 * sizeof(uint8_t));
 //     }
 
 //     // Allocation pour R[8][16], G[8][16], B[8][16]
-//     R = malloc(8 * sizeof(unsigned char *));
-//     G = malloc(8 * sizeof(unsigned char *));
-//     B = malloc(8 * sizeof(unsigned char *));
+//     R = malloc(8 * sizeof(uint8_t *));
+//     G = malloc(8 * sizeof(uint8_t *));
+//     B = malloc(8 * sizeof(uint8_t *));
 //     for (int i = 0; i < 8; i++) {
-//         R[i] = malloc(16 * sizeof(unsigned char));
-//         G[i] = malloc(16 * sizeof(unsigned char));
-//         B[i] = malloc(16 * sizeof(unsigned char));
+//         R[i] = malloc(16 * sizeof(uint8_t));
+//         G[i] = malloc(16 * sizeof(uint8_t));
+//         B[i] = malloc(16 * sizeof(uint8_t));
 //     }
 
 //     // ===== Remplissage avec des valeurs de test =====

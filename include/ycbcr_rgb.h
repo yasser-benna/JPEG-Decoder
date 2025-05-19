@@ -2,7 +2,7 @@
 #include <stdint.h>
 #include "reader.h"
 
-void YCbCr_to_rgb(unsigned char ***Y_blocks, unsigned char **Cb, unsigned char **Cr, 
-                 unsigned char ***R, unsigned char ***G, unsigned char ***B, 
+void YCbCr_to_rgb(uint8_t ***Y_blocks, uint8_t **Cb, uint8_t **Cr, 
+                 uint8_t ***R, uint8_t ***G, uint8_t ***B, 
                  int H_Y, int V_Y, int nb_blocks, int sampling);
 

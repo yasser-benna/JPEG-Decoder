@@ -4,7 +4,8 @@
 #include "../include/upsampling.h"
 #define N 8
 
-void up_sampling4_2_2_horizontal(unsigned char**C,unsigned char ***new_C, int H_Y, int V_Y){
+//Up_sampling 4:2:2 horizontal
+void up_sampling4_2_2_horizontal(uint8_t **C, uint8_t ***new_C, int H_Y, int V_Y){
     *new_C = malloc(N * V_Y * sizeof(int*));
     for (int i = 0; i < V_Y * N; i++) {
         (*new_C)[i] = malloc(N * H_Y * sizeof(int));
@@ -19,7 +20,8 @@ void up_sampling4_2_2_horizontal(unsigned char**C,unsigned char ***new_C, int H_
     }   
 }
 
-void up_sampling4_2_2_vertical(unsigned char**C,unsigned char ***new_C, int H_Y, int V_Y){
+//Up_sampling 4:2:2 vertical
+void up_sampling4_2_2_vertical(uint8_t**C,uint8_t ***new_C, int H_Y, int V_Y){
     *new_C = malloc(V_Y * N * sizeof(int*));
     for (int i = 0; i < V_Y * N; i++) {
         (*new_C)[i] = malloc(H_Y * N * sizeof(int));
@@ -34,8 +36,8 @@ void up_sampling4_2_2_vertical(unsigned char**C,unsigned char ***new_C, int H_Y,
     }   
 }
 
-
-void up_sampling4_2_0(unsigned char**C, unsigned char ***new_C, int H_Y, int V_Y) {
+//Up_sampling 4:2:0
+void up_sampling4_2_0(uint8_t **C, uint8_t ***new_C, int H_Y, int V_Y) {
     *new_C = malloc(V_Y * N * sizeof(int *));
     for (int i = 0; i < 2 * V_Y * N; i++) {
         (*new_C)[i] = malloc(H_Y * N * sizeof(int));
@@ -54,9 +56,7 @@ void up_sampling4_2_0(unsigned char**C, unsigned char ***new_C, int H_Y, int V_Y
     }
 }
 
-
-
-
+//Test de up_sampling
 // void afficher_matrice(int **matrice, int lignes, int colonnes, const char *nom) {
 //     printf("Matrice ww %s :\n", nom);
 //     for (int i = 0; i < lignes; i++) {

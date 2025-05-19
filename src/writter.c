@@ -73,8 +73,8 @@ void write_image_d(FILE*file, IMAGE_D image){
             }
             
     }
-void copy_mcu_to_image(IMAGE_D* image_d, unsigned char** R, unsigned char** G, 
-                       unsigned char** B, int mcu, int nb_mcus_x, 
+void copy_mcu_to_image(IMAGE_D* image_d, uint8_t** R, uint8_t** G, 
+                       uint8_t** B, int mcu, int nb_mcus_x, 
                        int H_Y, int V_Y) {
     // Calculez la position du MCU dans l'image
     int mcu_x = mcu % nb_mcus_x;
