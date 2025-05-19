@@ -86,9 +86,6 @@ int main(int argc, char* argv[]) {
         free(bloc_ap);
         free_huffman_table(huffman_dc, image->HUFFMAN_tables[0].nb_symbols);
         free_huffman_table(huffman_ac, image->HUFFMAN_tables[2].nb_symbols);
-        for(int i=0;i<8;i++){
-                free(spatial_block[i]);
-        }
         }
     else{
                 int H_Y = image->COMPONENTS[0].h_factor;  
