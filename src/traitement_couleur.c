@@ -10,6 +10,7 @@
 #include "upsampling.h"
 #include "ycbcr_rgb.h"
 #include "jpeg2ppm.h"
+#include "extraction_bloc.h"
 int traitement_color(IMAGE* image, IMAGE_D* image_d){
     int H_Y = image->COMPONENTS[0].h_factor;  
     int V_Y = image->COMPONENTS[0].v_factor;

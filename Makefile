@@ -13,7 +13,7 @@ SRC_FILES=$(wildcard src/*.c)
 
 # Par défaut, la compilation de src/toto.c génère le fichier objet obj/toto.o
 OBJ_FILES=$(patsubst src/%.c,obj/%.o,$(SRC_FILES))
-rnd=bitsmanip reader jpeg2ppm reader.exe bitsmanip.exe jpeg2ppm.exe idct idct.exe
+rnd=bitsmanip reader jpeg2ppm reader.exe bitsmanip.exe jpeg2ppm.exe idct idct.exe *.ppm
 
 all: jpeg2ppm
 
