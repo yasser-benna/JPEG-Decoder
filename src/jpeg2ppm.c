@@ -155,6 +155,10 @@ int main(int argc, char* argv[]) {
                 for (int i = 0; i < 8; i++) {
                     cr_bloc[i] = malloc(8 * sizeof(int));
                 }
+
+                int free_cb_spatial = 1;
+                int free_cr_spatial = 1;
+
                 for (int mcu = 0; mcu < total_mcus; mcu++) {
                     Y_final[mcu] = malloc(nb_blocs_Y * sizeof(uint8_t**));
                     for (int b = 0; b < nb_blocs_Y; b++) {  
@@ -169,8 +173,10 @@ int main(int argc, char* argv[]) {
                         inverse_zigzag(Cb_blocs[mcu][b], cb_bloc);
                         idct_rapide(cb_bloc,&cb_spatial);
                         // fucntion unifier 422 needed 
+                        free_cb_spatial = 1;
                         if (forbloc == 0) {
                             Cb_final[mcu][b] = cb_spatial;
+                            free_cb_spatial = 0;
                         }
                         else if (forbloc ==1) {
                             up_sampling4_2_2_horizontal(cb_spatial,&Cb_final[mcu][b], H_Y, V_Y);
@@ -181,14 +187,23 @@ int main(int argc, char* argv[]) {
                         else{
                             up_sampling4_2_0(cb_spatial, &Cb_final[mcu][b], H_Y, V_Y);
                         }
+                        // Free if needed after each use
+                        if (free_cb_spatial) {
+                            for (int i = 0; i < 8; i++) {
+                                free(cb_spatial[i]);
+                            }
+                            free(cb_spatial);
+                        }
                     }
                     for (int b = 0; b < nb_blocs_Cr; b++) {
                         quantification_inverse(Cr_blocs[mcu][b], image->Quant_Table[1]);
                         inverse_zigzag(Cr_blocs[mcu][b], cr_bloc);
                         idct_rapide(cr_bloc, &cr_spatial);
                         
+                        free_cr_spatial = 1;
                         if (forbloc == 0) {
                             Cr_final[mcu][b] = cr_spatial;
+                            free_cr_spatial = 0;
                         }
                         else if (forbloc ==1) {
                             up_sampling4_2_2_horizontal(cr_spatial,&Cr_final[mcu][b], H_Y, V_Y);
@@ -199,30 +214,100 @@ int main(int argc, char* argv[]) {
                         else{
                             up_sampling4_2_0(cr_spatial, &Cr_final[mcu][b], H_Y, V_Y);
                         }
+                        if (free_cr_spatial) {
+                            for (int i = 0; i < 8; i++) {
+                                free(cr_spatial[i]);
+                            }
+                            free(cr_spatial);
+                        }
                         
                     }
                     YCbCr_to_rgb(Y_final[mcu], Cb_final[mcu][0], Cr_final[mcu][0], &R, &G, &B, H_Y, V_Y, nb_blocs_Y, forbloc);
                     copy_mcu_to_image(image_d, R, G, B, mcu, nb_mcus_x, H_Y, V_Y);
+                    // Free RGB arrays
+                    for (int i = 0; i < 8 * V_Y; i++) {
+                        free(R[i]);
+                        free(G[i]);
+                        free(B[i]);
+                    }
+                    free(R);
+                    free(G);
+                    free(B);
+                    //free Yfinal, Cb_final, Cr_final
+                    for (int b = 0; b < nb_blocs_Y; b++) {
+                        for (int i = 0; i <8; i++) {
+                            free(Y_final[mcu][b][i]);
+                        }
+                        free(Y_final[mcu][b]);
+                    }
+                    free(Y_final[mcu]);
+                    for (int b = 0; b < nb_blocs_Cb; b++) {
+                        for(int i=0;i< V_Y*8;i++){
+                            free(Cb_final[mcu][b][i]);
+                        }
+                        free(Cb_final[mcu][b]);
+                    }
+                    free(Cb_final[mcu]);
+                    for (int b = 0; b < nb_blocs_Cr; b++) {
+                        for(int i=0;i< V_Y*8;i++){
+                            free(Cr_final[mcu][b][i]);
+                        }
+                        free(Cr_final[mcu][b]);
+                    }
+                    free(Cr_final[mcu]);
+
                 }
                 for (int i = 0; i < 8; i++) {
                     free(Y_bloc[i]);
                     free(cb_bloc[i]);
                     free(cr_bloc[i]);
-                    free(cb_spatial[i]);
-                    free(cr_spatial[i]);
                 }
+                
+
                 free(Y_bloc);
                 free(cb_bloc);
                 free(cr_bloc);
-                free(cb_spatial);
-                free(cr_spatial);
                 free_huffman_table(huffman_dc_Y, image->HUFFMAN_tables[0].nb_symbols);
                 free_huffman_table(huffman_ac_Y, image->HUFFMAN_tables[2].nb_symbols);
                 free_huffman_table(huffman_dc_C, image->HUFFMAN_tables[1].nb_symbols);
                 free_huffman_table(huffman_ac_C, image->HUFFMAN_tables[3].nb_symbols);
+                // free Y_final, Cb_final, Cr_final
+                for (int mcu = 0; mcu < total_mcus; mcu++) {
+                    // Free each Y block
+                    for (int i = 0; i < nb_blocs_Y; i++) {
+                        free(Y_blocs[mcu][i]);
+                    }
+                    free(Y_blocs[mcu]);
+                    
+                    // Free each Cb block
+                    for (int i = 0; i < nb_blocs_Cb; i++) {
+                        free(Cb_blocs[mcu][i]);
+                    }
+                    free(Cb_blocs[mcu]);
+                    
+                    // Free each Cr block
+                    for (int i = 0; i < nb_blocs_Cr; i++) {
+                        free(Cr_blocs[mcu][i]);
+                    }
+                    free(Cr_blocs[mcu]);
+                }
+                free(Y_blocs);
+                free(Cb_blocs);
+                free(Cr_blocs);
+                free(Y_final);
+                free(Cb_final);
+                free(Cr_final);
+
     } 
     // Libération de la mémoire
-    free(spatial_block);
+    if (spatial_block != NULL) {
+        for (int i = 0; i < 8; i++) {
+            if (spatial_block[i] != NULL) {
+                free(spatial_block[i]);
+            }
+        }
+        free(spatial_block);
+    }
     FILE* file = fopen("output1.ppm", "w");
     write_image_d(file, *image_d);
     fclose(file);
