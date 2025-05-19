@@ -77,6 +77,11 @@ int main(int argc, char* argv[]) {
                                 
             idct_rapide(bloc_ap, &spatial_block);
             copy_mcu_to_image(image_d, spatial_block, NULL, NULL, mcu, nb_mcus_x, 1, 1);
+            for (int i = 0; i < 8; i++) {
+                free(spatial_block[i]);
+            }
+            free(spatial_block);
+            spatial_block = NULL;
             
         }
         // Libérations
