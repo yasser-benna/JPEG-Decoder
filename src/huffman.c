@@ -49,7 +49,7 @@ uint32_t read_bits(const uint8_t *data, size_t *bit_pos, int n) {
 /* La fonction generer_codes_huffman permet de générer les code de huffman à partir de la liste des longeurs des 
 des codes et aussi l'ensemble des symboles. Ces données sont fournies dans la partie DHT du format JPEG .*/
 
-char **generer_codes_huffman(uint8_t symbols[256], uint8_t taille[16], int n_symboles) {
+char **generer_codes_huffman(uint8_t taille[16], int n_symboles) {
     // initialisation des variables 
     int i =0;
     int j=0;

@@ -46,11 +46,9 @@ int main(int argc, char* argv[]) {
     if (image->nb_components == 1){
         // Générer à nouveau les tables Huffman (au cas où elles changent dynamiquement)
         char** huffman_dc = generer_codes_huffman(
-            image->HUFFMAN_tables[0].symbols,
             image->HUFFMAN_tables[0].tailles,
             image->HUFFMAN_tables[0].nb_symbols);
         char** huffman_ac = generer_codes_huffman(
-            image->HUFFMAN_tables[2].symbols,
             image->HUFFMAN_tables[2].tailles,
             image->HUFFMAN_tables[2].nb_symbols);
             
@@ -101,10 +99,10 @@ int main(int argc, char* argv[]) {
                 int V_Cr = image->COMPONENTS[2].v_factor;
                 int forbloc;
                 // Génération des tables de Huffman pour DC et AC des composants Y et Cb, Cr
-                char** huffman_dc_Y = generer_codes_huffman(image->HUFFMAN_tables[0].symbols, image->HUFFMAN_tables[0].tailles, image->HUFFMAN_tables[0].nb_symbols);
-                char** huffman_ac_Y = generer_codes_huffman(image->HUFFMAN_tables[2].symbols, image->HUFFMAN_tables[2].tailles, image->HUFFMAN_tables[2].nb_symbols);
-                char** huffman_dc_C = generer_codes_huffman(image->HUFFMAN_tables[1].symbols, image->HUFFMAN_tables[1].tailles, image->HUFFMAN_tables[1].nb_symbols);
-                char** huffman_ac_C = generer_codes_huffman(image->HUFFMAN_tables[3].symbols, image->HUFFMAN_tables[3].tailles, image->HUFFMAN_tables[3].nb_symbols);
+                char** huffman_dc_Y = generer_codes_huffman( image->HUFFMAN_tables[0].tailles, image->HUFFMAN_tables[0].nb_symbols);
+                char** huffman_ac_Y = generer_codes_huffman( image->HUFFMAN_tables[2].tailles, image->HUFFMAN_tables[2].nb_symbols);
+                char** huffman_dc_C = generer_codes_huffman( image->HUFFMAN_tables[1].tailles, image->HUFFMAN_tables[1].nb_symbols);
+                char** huffman_ac_C = generer_codes_huffman( image->HUFFMAN_tables[3].tailles, image->HUFFMAN_tables[3].nb_symbols);
                 if (H_Y == H_Cr && H_Cb==H_Cr && V_Y == V_Cr && V_Cb==V_Cr) forbloc = 0;       // 4:4:4 
                 else if (H_Y == 2 * H_Cr && V_Y == V_Cb && H_Cb==H_Cr && V_Y == V_Cr && V_Cb==V_Cr) forbloc = 1;
                 else if (H_Y == H_Cr && V_Y == 2 * V_Cb && H_Cb==H_Cr && V_Y == 2 * V_Cr && V_Cb==V_Cr) forbloc = 2;  // 4:2:2 ila kant V_Y==1 rah horizontale o ila kan l3kss verticale 
@@ -224,7 +222,7 @@ int main(int argc, char* argv[]) {
                         }
                         
                     }
-                    YCbCr_to_rgb(Y_final[mcu], Cb_final[mcu][0], Cr_final[mcu][0], &R, &G, &B, H_Y, V_Y, nb_blocs_Y, forbloc);
+                    YCbCr_to_rgb(Y_final[mcu], Cb_final[mcu], Cr_final[mcu], &R, &G, &B, H_Y, V_Y, nb_blocs_Y, nb_blocs_Cb, forbloc);
                     copy_mcu_to_image(image_d, R, G, B, mcu, nb_mcus_x, H_Y, V_Y);
                     // Free RGB arrays
                     for (int i = 0; i < 8 * V_Y; i++) {

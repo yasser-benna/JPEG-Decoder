@@ -7,9 +7,9 @@
 /*La fonction YCbCr_to_rgb permet la conversion de YCbCr en RGB en se basant sur les formules simplifiées fournies. Sans
 oublier également les conditions de saturation.*/
 
-void YCbCr_to_rgb(uint8_t ***Y_blocks, uint8_t **Cb, uint8_t **Cr, 
+void YCbCr_to_rgb(uint8_t ***Y_bloc, uint8_t ***Cb_bloc, uint8_t ***Cr_bloc, 
                  uint8_t ***R, uint8_t ***G, uint8_t ***B, 
-                 int H_Y, int V_Y, int nb_blocks, int sampling) {
+                 int H_Y, int V_Y, int nb_blocks, int nb_block_C, int sampling) {
 
     //  Allocation mémoire 
     *R = malloc(8 * V_Y * sizeof(uint8_t*));
@@ -20,7 +20,7 @@ void YCbCr_to_rgb(uint8_t ***Y_blocks, uint8_t **Cb, uint8_t **Cr,
         (*G)[i] = malloc(8 * H_Y * sizeof(uint8_t*));
         (*B)[i] = malloc(8 * H_Y * sizeof(uint8_t*));
     }
-    
+    uint8_t Y, cb, cr;
     for (int i = 0; i < nb_blocks; i++) {
         for (int ligne = 0; ligne < 8; ligne++) {
             for (int colonne = 0; colonne < 8; colonne++) {
@@ -29,20 +29,30 @@ void YCbCr_to_rgb(uint8_t ***Y_blocks, uint8_t **Cb, uint8_t **Cr,
                 if (sampling == 3) { // cas du upsampling 4:2:0
                     global_ligne = (int)(i / V_Y) * 8 + ligne;
                     global_colonne = (i % H_Y) * 8 + colonne;
+                    Y = Y_bloc[i][ligne][colonne];
+                    cb = Cb_bloc[0][global_ligne][global_colonne];
+                    cr = Cr_bloc[0][global_ligne][global_colonne];
                 } 
-                else if (sampling == 1) { // cas du upsampling 4:2:2 horizontal
-                    global_ligne = ligne;
-                    global_colonne = (i % H_Y) * 8 + colonne;
-                } 
-                else { // cas du upsampling 4:2:2 vertical
+                else if (sampling == 2) { // cas du upsampling 4:2:2 vertical
                     global_ligne = (int)(i / H_Y) * 8 + ligne;
                     global_colonne = colonne;
+                    Y = Y_bloc[i][ligne][colonne];
+                    if (nb_block_C > 1){
+                        cb = Cb_bloc[(i%2)][global_ligne][global_colonne];
+                        cr = Cr_bloc[(i%2)][global_ligne][global_colonne];
+                    }
+                    else{
+                        cb = Cb_bloc[0][global_ligne][global_colonne];
+                        cr = Cr_bloc[0][global_ligne][global_colonne];
+                    }
+                } 
+                else { // cas du upsampling 4:2:2 horizontal
+                    global_ligne = ligne;
+                    global_colonne = (i % H_Y) * 8 + colonne;
+                    Y = Y_bloc[i][ligne][colonne];
+                    cb = Cb_bloc[(int)(i/2)][ligne][global_colonne];
+                    cr = Cr_bloc[(int)(i/2)][ligne][global_colonne];
                 }
-
-                uint8_t Y = Y_blocks[i][ligne][colonne];
-                uint8_t cb = Cb[global_ligne][global_colonne];
-                uint8_t cr = Cr[global_ligne][global_colonne];
-
                 // Utilisation des formules de conversion 
                 int r = Y + 1.402 * (cr - 128);
                 int g = Y - 0.34414 * (cb - 128) - 0.71414 * (cr - 128);
@@ -66,17 +76,17 @@ void YCbCr_to_rgb(uint8_t ***Y_blocks, uint8_t **Cb, uint8_t **Cr,
 //     // Dimensions
 //     int H_Y = 2, V_Y = 1;  // 1x2 blocs Y -> 8x16
 //     int nb_blocks = H_Y * V_Y;  // 2 blocs 8x8
-//     uint8_t ***Y_blocks;
+//     uint8_t ***Y_bloc;
 //     uint8_t **Cr;
 //     uint8_t **Cb;
 
 //     // ===== Allocation mémoire =====
-//     // Allocation pour Y_blocks[2][8][8]
-//     Y_blocks = malloc(nb_blocks * sizeof(uint8_t **));
+//     // Allocation pour Y_bloc[2][8][8]
+//     Y_bloc = malloc(nb_blocks * sizeof(uint8_t **));
 //     for (int b = 0; b < nb_blocks; b++) {
-//         Y_blocks[b] = malloc(8 * sizeof(uint8_t *));
+//         Y_bloc[b] = malloc(8 * sizeof(uint8_t *));
 //         for (int i = 0; i < 8; i++) {
-//             Y_blocks[b][i] = malloc(8 * sizeof(uint8_t));
+//             Y_bloc[b][i] = malloc(8 * sizeof(uint8_t));
 //         }
 //     }
 
@@ -102,7 +112,7 @@ void YCbCr_to_rgb(uint8_t ***Y_blocks, uint8_t **Cb, uint8_t **Cr,
 //     for (int b = 0; b < nb_blocks; b++) {
 //         for (int i = 0; i < 8; i++) {
 //             for (int j = 0; j < 8; j++) {
-//                 Y_blocks[b][i][j] = 180;  // Y clair
+//                 Y_bloc[b][i][j] = 180;  // Y clair
 //             }
 //         }
 //     }
@@ -115,7 +125,7 @@ void YCbCr_to_rgb(uint8_t ***Y_blocks, uint8_t **Cb, uint8_t **Cr,
 //     }
     
 //     // ===== Appel de la fonction =====
-//     YCbCr_to_rgb(Y_blocks, Cb, Cr, &R, &G, &B, H_Y, V_Y, nb_blocks, 1);  // 1 = 4:2:2 horizontal
+//     YCbCr_to_rgb(Y_bloc, Cb, Cr, &R, &G, &B, H_Y, V_Y, nb_blocks, 1);  // 1 = 4:2:2 horizontal
     
 //     // ===== Vérification =====
 //     printf("R[0][0] = %d (attendu ~255)\n", R[0][0]);
@@ -129,14 +139,14 @@ void YCbCr_to_rgb(uint8_t ***Y_blocks, uint8_t **Cb, uint8_t **Cr,
 //     }
     
 //     // ===== Libération mémoire =====
-//     // Libération de Y_blocks[2][8][8]
+//     // Libération de Y_bloc[2][8][8]
 //     for (int b = 0; b < nb_blocks; b++) {
 //         for (int i = 0; i < 8; i++) {
-//             free(Y_blocks[b][i]);
+//             free(Y_bloc[b][i]);
 //         }
-//         free(Y_blocks[b]);
+//         free(Y_bloc[b]);
 //     }
-//     free(Y_blocks);
+//     free(Y_bloc);
 
 //     // Libération de Cb[8][8] et Cr[8][8]
 //     for (int i = 0; i < 8; i++) {
