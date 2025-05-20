@@ -24,7 +24,8 @@ build-job:       # This job runs in the build stage, which runs first.
   stage: build
   script:
     - apk update && apk add libc-dev gcc make
-    - make
+    - make clean
+    - make jpeg2ppm
   artifacts:
     untracked: true
     when: on_success
@@ -34,13 +35,13 @@ test-nb-relatif:
   stage: test       # s'exécute à l'étape 'test'
   script:
     - mkdir -p out  # on crée le répertoire de sortie
-    - ./jpeg2ppm --outfile=./out/invader.pgm ./images/invader.jpg
-    - test -f ./out/invader.pgm # on vérifie que le fichier de sortie existe
+    - ./jpeg2ppm $(pwd)/images/invader.jpeg
+    - test -f $(pwd)/images/invader.pgm # on vérifie que le fichier de sortie existe
 
 test-nb-absolu:
   stage: test       # s'exécute à l'étape 'test'
   script:
     - mkdir -p out  # on crée le répertoire de sortie
-    - echo $(pwd)/images/invader.jpg # regardez, un chemin absolu !
-    - ./jpeg2ppm --outfile=$(pwd)/out/invader.pgm $(pwd)/images/invader.jpg
-    - test -f ./out/invader.pgm # on vérifie que le fichier de sortie existe
+    - echo $(pwd)/images/invader.jpeg # regardez, un chemin absolu !
+    - ./jpeg2ppm $(pwd)/images/invader.jpeg
+    - test -f $(pwd)/images/invader.pgm # on vérifie que le fichier de sortie existe
