@@ -29,7 +29,7 @@ int main(int argc, char* argv[]) {
         fprintf(stderr, "Erreur de lecture du fichier JPEG.\n");
         return 2;
     }
-    char* output_filename = create_output_filename(argv[1]);
+    char* output_filename = create_output_filename(argv[1],image->nb_components==3);
     IMAGE_D* image_d = init_image_d(image->Largeur, image->Hauteur, image->nb_components==3);
     if (image->nb_components == 1){
         traitement_grayscale(image, image_d);

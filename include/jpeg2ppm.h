@@ -1,3 +1,4 @@
+#pragma once
 // Énumération des formats d'échantillonnage pour une meilleure lisibilité
 typedef enum {
     SAMPLING_444 = 0,     // Format 4:4:4 - pas de sous-échantillonnage
