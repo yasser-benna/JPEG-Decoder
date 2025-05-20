@@ -55,7 +55,7 @@ int traitement_grayscale(IMAGE* image,IMAGE_D*image_d){
         spatial_block = NULL;
         
     }
-    // Libérations
+    // frees 
     for (int i = 0; i < 8; i++){
         free(bloc_ap[i]);
     } 

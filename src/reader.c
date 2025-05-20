@@ -14,7 +14,7 @@
 #define DHT 0xffc4
 #define SOS 0xffda
 
-// function to initialize the image structure
+// Fonction pour initialiser la structure IMAGE
 IMAGE* init_image() {
     IMAGE* img = malloc(sizeof(IMAGE));
     if (!img) {
@@ -44,7 +44,7 @@ IMAGE* init_image() {
     return img;
 }
 
-// function to free the image structure
+// fonction pour free la structure IMAGE
 void free_image(IMAGE* img) {
     if (img) {
         if (img->COMMENTAIRE) {
@@ -60,7 +60,7 @@ void free_image(IMAGE* img) {
     }
 }
 
-// function to read the jpeg file
+// fonction pour lire le fichier jpeg
 IMAGE* read_jpeg(const char* file_name){
     BitStream* bs=bitstream_init(file_name);
     if(bs==NULL){
@@ -102,7 +102,7 @@ IMAGE* read_jpeg(const char* file_name){
     bitstream_close(bs);
     return image;
 }
-// function to clear SOI section
+// fonction pour vérifier la section SOI
 void read_soi(BitStream*bs){
     uint16_t marqueur=0;
     marqueur=bitstream_read_bits(bs,16);
@@ -111,7 +111,7 @@ void read_soi(BitStream*bs){
         exit(0);
     } 
 }
-// function to clear EOI section
+// Fonction pour vérifier la section EOI
 void read_eoi(BitStream*bs){
     uint16_t marqueur=0;
     marqueur=bitstream_read_bits(bs,16);
@@ -120,7 +120,7 @@ void read_eoi(BitStream*bs){
         exit(0);
     }
 }
-// function to clear APPX section
+// Fonction pour vérifier la section APPX
 void read_appx(BitStream*bs,IMAGE*image){
     uint16_t marqueur=0;
     marqueur=bitstream_read_bits(bs,16);
@@ -167,7 +167,7 @@ void read_appx(BitStream*bs,IMAGE*image){
     image->APPX=0;
     bitstream_read_bits(bs,(section_size-9)*8);
 }
-// function to clear COM section
+// Fonction pour vérifier la section COM
 void read_com(BitStream*bs,IMAGE*image){
     uint16_t marqueur=0;
     marqueur=bitstream_read_bits(bs,16);
@@ -184,7 +184,7 @@ void read_com(BitStream*bs,IMAGE*image){
     }
     image->COMMENTAIRE[section_size-2]='\0';
 }
-// function to clear DQT section
+// Fonction pour vérifier la section DQT
 void read_dqt(BitStream*bs,IMAGE*image){
     uint16_t marqueur=0;
     marqueur=bitstream_read_bits(bs,16);
@@ -205,7 +205,7 @@ void read_dqt(BitStream*bs,IMAGE*image){
             printf("ERROR: Invalid quantization table ID %d\n", table_id);
             exit(0);
         }
-        // unuseful but maybe in progressive
+        // inutile mais peut etre dans le mode progressif 
         if(precision==0){
             byter_size=8;
         }else{
@@ -219,7 +219,7 @@ void read_dqt(BitStream*bs,IMAGE*image){
 
     }
 }
-// function to clear SOF0 section
+// Fonction pour vérifier la section SOF0
 void read_sofx(BitStream*bs,IMAGE*image){
     uint16_t marqueur=0;
     marqueur=bitstream_read_bits(bs,16);
@@ -257,7 +257,7 @@ void read_sofx(BitStream*bs,IMAGE*image){
     }
 
 }
-// function to clear DHT section
+// Fonction pour vérifier la section DHT
 void read_dht(BitStream*bs,IMAGE*image){
     uint16_t marqueur=0;
     marqueur=bitstream_read_bits(bs,16);
@@ -303,7 +303,7 @@ void read_dht(BitStream*bs,IMAGE*image){
         }
     }
 }
-// function to clear SOS section
+// Fonction pour vérifier la section SOS
 void read_sos(BitStream*bs,IMAGE*image){
     uint16_t marqueur =0;
     marqueur= bitstream_read_bits(bs, 16);
@@ -348,7 +348,7 @@ void read_sos(BitStream*bs,IMAGE*image){
     image->compressed_size=position;
 }
 
-// Test function
+// Fonction de test
 // int main() {
 
 //     IMAGE* image=read_jpeg("./images/invader.jpeg");

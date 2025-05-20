@@ -1,12 +1,11 @@
 #pragma once
-
 #include <stdio.h>
 #include <stdint.h>
 
 typedef struct {
     FILE *fp;           // Pointeur de fichier
     uint8_t buffer;     // Octet en cours de traitement
-    int bits_available; // Nombre de bits disponibles dans le tampon
+    int bits_available; // Nombre de bits disponibles dans le Buffer 
     long bytes_read;    // Nombre total d'octets lus à partir du fichier
     int is_eof;         // Indicateur de fin de fichier
 } BitStream;
@@ -29,7 +28,7 @@ uint32_t bitstream_peek_bits(BitStream* bs, int n);
 // Obtenir fp
 FILE*get_fp(BitStream bs);
 
-// Obtenir le tampon
+// Obtenir le Buffer
 uint8_t get_buffer(BitStream bs);
 
 // Obtenir les bits disponibles
@@ -40,5 +39,4 @@ long get_bytes_read(BitStream bs);
 
 // Obtenir l'indicateur de fin de fichier
 int get_is_eof(BitStream bs);
-
 

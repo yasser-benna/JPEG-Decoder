@@ -28,7 +28,7 @@ void bitstream_close(BitStream* bs) {
     }
 }
 
-// Fonction pour remplir le tampon avec des données du fichier
+// Fonction pour remplir le Buffer avec des données du fichier
 static void bitstream_fill_buffer(BitStream* bs) {
     if (get_bits_available(*bs) == 0 && !get_is_eof(*bs)) {
         int byte = fgetc(get_fp(*bs));
@@ -41,7 +41,7 @@ static void bitstream_fill_buffer(BitStream* bs) {
         }
     }
 }
-// Fonction pour lire un seul bit du tampon
+// Fonction pour lire un seul bit du Buffer
 uint8_t bitstream_read_bit(BitStream* bs) {
     bitstream_fill_buffer(bs);
     if (get_bits_available(*bs) == 0) {
@@ -49,13 +49,13 @@ uint8_t bitstream_read_bit(BitStream* bs) {
     }
     // Obtenir le bit le plus significatif
     uint8_t bit = (get_buffer(*bs) >> 7) & 1;
-    // Décaler le tampon vers la gauche de 1 bit
+    // Décaler le Buffer vers la gauche de 1 bit
     bs->buffer <<= 1;
     bs->bits_available--;
     return bit;
 }
 
-// Fonction pour lire n bits du tampon
+// Fonction pour lire n bits du Buffer
 uint32_t bitstream_read_bits(BitStream* bs, int n) {
     uint32_t result = 0;
     for (int i = 0; i < n; i++) {
@@ -63,7 +63,7 @@ uint32_t bitstream_read_bits(BitStream* bs, int n) {
     }
     return result;
 }
-// Fonction pour consulter n bits du tampon sans les consommer
+// Fonction pour consulter n bits du Buffer sans les consommer
 uint32_t bitstream_peek_bits(BitStream* bs, int n) {
     // Sauvegarder l'état actuel
     uint8_t saved_buffer = get_buffer(*bs);
@@ -86,7 +86,7 @@ FILE*get_fp(BitStream bs){
     return bs.fp;
 }
 
-// Fonction pour obtenir le tampon depuis BitStream
+// Fonction pour obtenir le Buffer depuis BitStream
 uint8_t get_buffer(BitStream bs){
     return bs.buffer;
 

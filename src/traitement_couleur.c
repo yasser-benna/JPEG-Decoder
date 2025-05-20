@@ -69,7 +69,7 @@ int traitement_color(IMAGE* image, IMAGE_D* image_d){
         fprintf(stderr, "Memory allocation failed\n");
         exit(1);
     }
-    // Allocate working blocks
+    // allouer les blocs courants
     int16_t **Y_bloc = malloc(8 * sizeof(int16_t*));
     int16_t **cb_bloc = malloc(8 * sizeof(int16_t*));
     int16_t **cr_bloc = malloc(8 * sizeof(int16_t*));
@@ -83,7 +83,7 @@ int traitement_color(IMAGE* image, IMAGE_D* image_d){
             exit(1);
         }
     }
-    // Process each MCU
+    // Traiter chaque MCU
     uint8_t **cb_spatial, **cr_spatial;
     uint8_t **R, **G, **B;
     int free_cb_spatial = 1;
@@ -220,13 +220,13 @@ int traitement_color(IMAGE* image, IMAGE_D* image_d){
         }
         free(Y_blocs[mcu]);
         
-        // Free each Cb block
+        // Free chaque Cb block
         for (int i = 0; i < nb_blocs_Cb; i++) {
             free(Cb_blocs[mcu][i]);
         }
         free(Cb_blocs[mcu]);
         
-        // Free each Cr block
+        // Free chaque Cr block
         for (int i = 0; i < nb_blocs_Cr; i++) {
             free(Cr_blocs[mcu][i]);
         }

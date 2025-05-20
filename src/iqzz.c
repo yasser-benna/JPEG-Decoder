@@ -3,7 +3,7 @@
 #include <stdlib.h>
 
 #define N 8
-// function to perform the inverse quantification
+// fonction de quantification inverse
 void quantification_inverse(int *dct_coeff, const uint16_t *quant_table) {
     for (int i = 0; i < N; i++) {
         for (int j = 0; j < N; j++) {
@@ -11,7 +11,7 @@ void quantification_inverse(int *dct_coeff, const uint16_t *quant_table) {
         }
     }
 }
-// Test function
+// Fonction de test 
 
 // int main() {
 //     int *dct_coeff = malloc(N * N * sizeof(int));
