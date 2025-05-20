@@ -5,28 +5,25 @@
 #include <stdint.h>
 #include "bitsmanip.h"
 
-// function to read a single bit from the data stream
+// Fonction pour lire un seul bit du flux de données
 uint8_t read_bit(const uint8_t *data, size_t *bit_pos) ;
-// function to read n bits from the data stream
+// Fonction pour lire n bits du flux de données
 uint32_t read_bits(const uint8_t *data, size_t *bit_pos, int n);
-// function to generate Huffman codes
+// Fonction pour générer des codes Huffman
 char **generer_codes_huffman(uint8_t taille[16], int n_symboles);
 
-// -taille est un  tableau représentant le nombre de codes de chaque longueur (de 1 à 16 bits).
-
-//ce tableau indique combien de codes ont 1 bit, combien en ont 2 bits jusqu’à 16.
-
+// -taille est un tableau représentant le nombre de codes de chaque longueur (de 1 à 16 bits).
+//ce tableau indique combien de codes ont 1 bit, combien en ont 2 bits jusqu'à 16.
 //- symbole est un tableau de chaînes de caractères représentant les symboles que tu veux encoder en Huffman. 
-
 // - n_symbole est le nombre de symbole qu'on a.
 
-// function to free the Huffman table
+// Fonction pour libérer la table de Huffman
 void free_huffman_table(char **table_huffman, int taille );
-// function to decode a Huffman 
+// Fonction pour décoder un code Huffman
 int decoder_huffman(const uint8_t *data, size_t *bit_pos, char **table_huffman, int n_symboles);
-// function to calculate the magnitude of a value
+// Fonction pour calculer la magnitude d'une valeur
 int magnitude(int taille, uint32_t valeur);
-// function to decode a block of data
+// Fonction pour décoder un bloc de données
 void decoder_bloc(
     const uint8_t *data, size_t *bit_pos,
     char **table_huffman_dc, uint8_t symboles_dc[256], int nbr_sym_dc,

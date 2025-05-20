@@ -6,7 +6,7 @@
 #include "bitsmanip.h"
 #include "huffman.h"
 
-
+// Fonction pour extraire les blocs de l'image compressée
 void extraire_bloc(const uint8_t *data, size_t *bit_pos,
                    char **table_huffman_dc_Y, uint8_t symboles_dc_Y[256], int nbr_sym_dc_Y,
                    char **table_huffman_ac_Y, uint8_t symboles_ac_Y[256], int nbr_sym_ac_Y,

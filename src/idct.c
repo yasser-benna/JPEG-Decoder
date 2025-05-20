@@ -37,6 +37,7 @@ void idct_naive(int16_t **bloc_freq, uint8_t ***bloc_spatial) {
 }
 
 //Implémentation de l'IDCT rapide de Loeffler
+// Étape 1: Réarrangement initial des coefficients
 void etape1_idct_rapide(int16_t x[8], double y[8]){
     y[0] = x[0];
     y[1] = x[4];
@@ -48,6 +49,7 @@ void etape1_idct_rapide(int16_t x[8], double y[8]){
     y[7] = (x[1] + x[7]) / 2;
 }
 
+// Étape 1 avec entrée en double pour le traitement des colonnes
 void etape1_idct_rapide_double(double x[8], double y[8]){
     y[0] = x[0];
     y[1] = x[4];
@@ -58,6 +60,7 @@ void etape1_idct_rapide_double(double x[8], double y[8]){
     y[6] = x[5] * INV_SQRT2;
     y[7] = (x[1] + x[7]) / 2;
 }
+// Étape 2: Première série de papillons (butterflies)
 void etape2_idct_rapide(double x[8], double y[8], double c6_1, double c6_2){
     y[0] = (x[0] + x[1])/2;
     y[1] = (x[0] - x[1])/2;
@@ -69,6 +72,7 @@ void etape2_idct_rapide(double x[8], double y[8], double c6_1, double c6_2){
     y[7] = (x[7] + x[5]) / 2;
 }
 
+// Étape 3: Deuxième série de papillons avec rotations
 void etape3_idct_rapide(double x[8], double y[8], double c1_1, double c1_2, double c3_1, double c3_2){
     y[0] = (x[0] + x[3])/2;
     y[1] = (x[1] + x[2])/2;
@@ -80,6 +84,7 @@ void etape3_idct_rapide(double x[8], double y[8], double c1_1, double c1_2, doub
     y[7] = c3_1 * x[7] + c3_2 * x[4];
 }
 
+// Étape 4: Opérations finales pour préparer la sortie
 void etape4_idct_rapide(double x[8], double y[8]){
     y[0] = (x[0] + x[7]) / 2;
     y[1] = (x[1] + x[6]) / 2;
@@ -92,19 +97,22 @@ void etape4_idct_rapide(double x[8], double y[8]){
 }
 
 void idct_rapide(int16_t **bloc_freq, uint8_t ***bloc_spatial) {
+    // Calcul des coefficients de rotation pour l'algorithme de Loeffler
     double c6_1 = cos(3*PI/8);
     double c6_2 = sin(3*PI/8);
     double c3_1 = cos(3*PI/16);
     double c3_2 = sin(3*PI/16);
     double c1_1 = cos(PI/16);
     double c1_2 = sin(PI/16);
-    double buff1[8], buff2[8];
-    double tmp[8][8];
-    double val_colonne[8];
+    double buff1[8], buff2[8]; // Tampons pour les calculs intermédiaires
+    double tmp[8][8];          // Résultat intermédiaire des lignes
+    double val_colonne[8];     // Valeurs d'une colonne pour le traitement vertical
+    // Allocation de la mémoire pour le bloc spatial résultant
     *bloc_spatial = malloc(N * sizeof(uint8_t *));
     for (int i = 0; i < 8; i++) {
         (*bloc_spatial)[i] = malloc(N * sizeof(uint8_t));
         }
+    // Traitement des lignes (1D IDCT horizontale)
     for (int i = 0; i< 8; i++) {
         etape1_idct_rapide(bloc_freq[i], buff1);
         etape2_idct_rapide(buff1, buff2, c6_1, c6_2);
@@ -114,6 +122,7 @@ void idct_rapide(int16_t **bloc_freq, uint8_t ***bloc_spatial) {
             tmp[i][j] = buff2[j];
         }
     }
+    // Traitement des colonnes (1D IDCT verticale)
     for (int j = 0; j < 8; j++) {
         for (int i = 0; i < 8; i++){
             val_colonne[i] = tmp[i][j];
@@ -123,9 +132,9 @@ void idct_rapide(int16_t **bloc_freq, uint8_t ***bloc_spatial) {
         etape3_idct_rapide(buff2, buff1, c1_1, c1_2, c3_1, c3_2);
         etape4_idct_rapide(buff1, buff2);
         for (int i = 0; i < 8; ++i) {
-            double val = buff2[i] * 8 + 128 ;
-            if (val < 0) val = 0;
-            if (val > 255) val = 255;
+            double val = buff2[i] * 8 + 128 ; // Mise à l'échelle et décalage pour obtenir des valeurs d'image
+            if (val < 0) val = 0;             // Saturation des valeurs négatives
+            if (val > 255) val = 255;         // Saturation des valeurs supérieures à 255
             (*bloc_spatial)[i][j] = (uint8_t)(round(val));
         }
     }
@@ -162,7 +171,7 @@ void idct_rapide(int16_t **bloc_freq, uint8_t ***bloc_spatial) {
 //         }
 //     }
 //     idct_fast_asf_boi(freq, &spatial);
-//     printf("Bloc spatial (aprÃ¨s IDCT) :\n");
+//     printf("Bloc spatial (après IDCT) :\n");
 //     for (int i = 0; i < N; i++) {
 //         for (int j = 0; j < N; j++) {
 //             printf("%4hx ", spatial[i][j]);
