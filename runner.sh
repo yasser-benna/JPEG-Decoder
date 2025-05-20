@@ -3,28 +3,21 @@ make clean > /dev/null
 make > /dev/null
 # Répertoire de sortie
 OUTPUT_DIR="./images"
-mkdir -p "$OUTPUT_DIR"
-
-# Fichier temporaire pour stocker la liste des fichiers
-TMP_FILE_LIST="./file_list.txt"
-> "$TMP_FILE_LIST"  # Vide ou crée le fichier
 
 # Compteur
 count=0
 
 # Trouver tous les fichiers JPEG (insensible à la casse)
 echo "Recherche de fichiers JPEG dans ./images/"
-find ./images/ -type f -iname "*.jp*g" | sort > "$TMP_FILE_LIST"
+find ./images/ -type f -iname "*.jp*g" | sort
 
-# Affichage
-echo "Fichiers trouvés:"
-cat "$TMP_FILE_LIST"
 echo "------------------------------"
 
 read -p "Appuyez sur Entrée pour commencer..."
 
-# Parcours de la liste
-while read -r file; do
+# Process all files with case-insensitive matching
+find ./images/ -type f -iname "*.jp*g" | sort | while read file
+do
     # Nom de base
     filename=$(basename "$file")
     base="${filename%.*}"
@@ -61,10 +54,9 @@ while read -r file; do
 
     eog "$OUTPUT_DIR/$output_file"
     echo "------------------------------"
-done < "$TMP_FILE_LIST"
+done
 
 # Résumé
-total_files=$(wc -l < "$TMP_FILE_LIST")
 echo "Conversion terminée : $count fichiers sur $total_files."
 
 # Nettoyage
