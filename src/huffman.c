@@ -10,7 +10,7 @@ du Byte Stuffing mentionné dans le sujet .*/
 
 uint8_t read_bit(const uint8_t *data, size_t *bit_pos) {
 
-    static size_t precedent_octet = SIZE_MAX;
+    static size_t precedent_octet = SIZE_MAX; // Mémorise l'octet précédent pour détecter le byte stuffing
     size_t indice_byte = *bit_pos / 8; // l'indice de l'octet 
     size_t bit_offset = *bit_pos % 8;  // l'emplacement du bit dans cet octet 
 
@@ -21,6 +21,7 @@ uint8_t read_bit(const uint8_t *data, size_t *bit_pos) {
         *bit_pos += 8; 
     }
 
+    // Vérifie si l'indice de l'octet est valide
     if (indice_byte >= SIZE_MAX) {
         precedent_octet = indice_byte;
     }
@@ -57,7 +58,7 @@ char **generer_codes_huffman(uint8_t taille[16], int n_symboles) {
     int code = 0;
     int longueur_code=1;
     int nbr_code;
-    char **table_huffman = malloc(n_symboles * sizeof(char *));
+    char **table_huffman = malloc(n_symboles * sizeof(char *)); // Allocation pour la table des codes Huffman
 
     // ici on parcourt de 1 à 16, car un code ne peut pas avoir une taille supérieur à 16 bits 
     for (longueur_code = 1; longueur_code <= 16; longueur_code++) {
@@ -67,11 +68,11 @@ char **generer_codes_huffman(uint8_t taille[16], int n_symboles) {
             if (i >= n_symboles) {
                 break;  
             }
-            table_huffman[i] = malloc((longueur_code + 1) * sizeof(char));
+            table_huffman[i] = malloc((longueur_code + 1) * sizeof(char)); // +1 pour le caractère nul
             for (k = 0; k < longueur_code; k++) {
                 table_huffman[i][k] = ((code >> (longueur_code - 1 - k)) & 1) + '0'; // méthode qui permet de génére code de Huffman connaissant seulement la longueur du code 
             }
-            table_huffman[i][longueur_code] = '\0';
+            table_huffman[i][longueur_code] = '\0'; // Termine la chaîne de caractères
             i++; // incrémentation pour passer au prchain symbole
             code++; // incrémentation pour passer au prochain code 
         }
@@ -83,7 +84,7 @@ char **generer_codes_huffman(uint8_t taille[16], int n_symboles) {
     
 }
 
-
+// Fonction pour libérer la mémoire allouée pour la table de Huffman
 void free_huffman_table(char **table_huffman, int taille) {
     for (int i = 0; i < taille; i++) {
         free(table_huffman[i]); 
@@ -103,7 +104,7 @@ int decoder_huffman(const uint8_t *data, size_t *bit_pos, char **table_huffman, 
 
         uint8_t bit_courant = read_bit(data, bit_pos); // lecture de bit 
         code_lu[compteur_de_bit] = bit_courant + '0'; // conversion le bit en caractère 
-        code_lu[compteur_de_bit + 1] = '\0';
+        code_lu[compteur_de_bit + 1] = '\0'; // Termine la chaîne pour la comparaison
         compteur_de_bit++;
         for (int i = 0; i < n_symboles; i++) {
             if (strcmp(code_lu, table_huffman[i]) == 0) {
@@ -111,7 +112,7 @@ int decoder_huffman(const uint8_t *data, size_t *bit_pos, char **table_huffman, 
             }
         }
     }
-    return -1; 
+    return -1; // Code non trouvé dans la table
 }
 
 
@@ -143,7 +144,7 @@ void decoder_bloc(
     for (int i = 0; i <= 63; i++) {
         bloc[i] = 0; 
     }
-    // Lire symbole DC 
+    // Décodage du coefficient DC
     int indice_dc = decoder_huffman(data, bit_pos, table_huffman_dc, nbr_sym_dc);
     uint8_t taille_dc = symboles_dc[indice_dc]; // la taille du DC à lire
     uint32_t bits_dc = read_bits(data, bit_pos, taille_dc); // lecture des taille_dc bits en utilisant la fonction read_bits 
@@ -151,6 +152,7 @@ void decoder_bloc(
     bloc[0] = *dc_precedent + valeur_dc; // ajout de valeur_dc à dc_precedent 
     *dc_precedent = bloc[0];
 
+    // Décodage des 63 coefficients AC
     int j = 1;
     while (j <= 63) {
         int indice_ac = decoder_huffman(data, bit_pos, table_huffman_ac, nbr_sym_ac);

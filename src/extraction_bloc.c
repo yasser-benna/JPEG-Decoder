@@ -32,7 +32,7 @@ void extraire_bloc(const uint8_t *data, size_t *bit_pos,
     int nb_blocs_Cb = H_Cb * V_Cb; // nombre de blocs Cb dans chaque MCU
     int nb_blocs_Cr = H_Cr * V_Cr; // nombre de blocs Cr dans chaque MCU
 
-    // Allocation mémoire 
+    // Allocation mémoire pour les coefficients des composantes
     *Y  = malloc(total_mcus * sizeof(int **));    
     *Cb = malloc(total_mcus * sizeof(int **));
     *Cr = malloc(total_mcus * sizeof(int **));
@@ -45,6 +45,7 @@ void extraire_bloc(const uint8_t *data, size_t *bit_pos,
 
     // Boucle sur le nombre de MCU
     for (int mcu = 0; mcu < total_mcus; mcu++) {
+        // Allocation et décodage pour la composante Y
         (*Y)[mcu] = malloc(nb_blocs_Y * sizeof(int *));
         for (int i = 0; i < nb_blocs_Y; i++) {
             (*Y)[mcu][i] = malloc(64 * sizeof(int));
@@ -54,6 +55,7 @@ void extraire_bloc(const uint8_t *data, size_t *bit_pos,
                          &dc_prec_Y, (*Y)[mcu][i]); //on applique la fonction decoder_bloc sur chaque bloc 8x8 de la composante Y dans chaque MCU
         }
         
+        // Allocation et décodage pour la composante Cb
         (*Cb)[mcu] = malloc(nb_blocs_Cb * sizeof(int *));
         for (int i = 0; i < nb_blocs_Cb; i++) {
             (*Cb)[mcu][i] = malloc(64 * sizeof(int));
@@ -63,6 +65,7 @@ void extraire_bloc(const uint8_t *data, size_t *bit_pos,
                             &dc_prec_Cb, (*Cb)[mcu][i]); //on applique la fonction decoder_bloc sur chaque bloc 8x8 de la composante Cn dans chaque MCU
         }
 
+        // Allocation et décodage pour la composante Cr
         (*Cr)[mcu] = malloc(nb_blocs_Cr * sizeof(int *));
         for (int i = 0; i < nb_blocs_Cr; i++) {
             (*Cr)[mcu][i] = malloc(64 * sizeof(int));
