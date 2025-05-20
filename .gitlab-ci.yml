@@ -34,13 +34,13 @@ test-nb-relatif:
   stage: test       # s'exécute à l'étape 'test'
   script:
     - mkdir -p out  # on crée le répertoire de sortie
-    - ./jpeg2ppm --outfile=./out/invader.pgm ./images/invader.jpg
-    - test -f ./out/invader.pgm # on vérifie que le fichier de sortie existe
+    - ./jpeg2ppm ./images/invader.jpg
+    - test -f ./images/invader.pgm # on vérifie que le fichier de sortie existe
 
 test-nb-absolu:
   stage: test       # s'exécute à l'étape 'test'
   script:
     - mkdir -p out  # on crée le répertoire de sortie
     - echo $(pwd)/images/invader.jpg # regardez, un chemin absolu !
-    - ./jpeg2ppm --outfile=$(pwd)/out/invader.pgm $(pwd)/images/invader.jpg
-    - test -f ./out/invader.pgm # on vérifie que le fichier de sortie existe
+    - ./jpeg2ppm $(pwd)/images/invader.jpg
+    - test -f ./images/invader.pgm # on vérifie que le fichier de sortie existe
