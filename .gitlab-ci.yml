@@ -43,4 +43,4 @@ test-nb-absolu:
     - mkdir -p out  # on crée le répertoire de sortie
     - echo $(pwd)/images/invader.jpg # regardez, un chemin absolu !
     - ./jpeg2ppm $(pwd)/images/invader.jpg
-    - test -f ./images/invader.pgm # on vérifie que le fichier de sortie existe
+    - test -f $(pwd)/images/invader.pgm # on vérifie que le fichier de sortie existe
