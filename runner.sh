@@ -1,6 +1,6 @@
 #!/bin/bash
-# filepath: /home/bloops/PROJETC/finales/team8/runner.sh
-
+make clean > /dev/null
+make > /dev/null
 # Répertoire de sortie
 OUTPUT_DIR="./images"
 mkdir -p "$OUTPUT_DIR"
@@ -70,6 +70,6 @@ echo "Conversion terminée : $count fichiers sur $total_files."
 # Nettoyage
 rm -f "$TMP_FILE_LIST"
 rm -f ./images/*.ppm ./images/*.pgm
-
+make clean > /dev/null
 read -p "Appuyez sur Entrée pour quitter..."
 clear
