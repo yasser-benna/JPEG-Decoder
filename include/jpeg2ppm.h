@@ -1,3 +1,4 @@
+#pragma once
 // Enumeration for sampling formats for better readability
 typedef enum {
     SAMPLING_444 = 0,
