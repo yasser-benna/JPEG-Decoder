@@ -37,7 +37,7 @@ void idct_naive(int16_t **bloc_freq, uint8_t ***bloc_spatial) {
 }
 
 //Implémentation de l'IDCT rapide de Loeffler
-// Étape 1: Réarrangement initial des coefficients
+// Étape 1
 void etape1_idct_rapide(int16_t x[8], double y[8]){
     y[0] = x[0];
     y[1] = x[4];
@@ -49,7 +49,7 @@ void etape1_idct_rapide(int16_t x[8], double y[8]){
     y[7] = (x[1] + x[7]) / 2;
 }
 
-// Étape 1 avec entrée en double pour le traitement des colonnes
+// Étape 1
 void etape1_idct_rapide_double(double x[8], double y[8]){
     y[0] = x[0];
     y[1] = x[4];
@@ -60,20 +60,20 @@ void etape1_idct_rapide_double(double x[8], double y[8]){
     y[6] = x[5] * INV_SQRT2;
     y[7] = (x[1] + x[7]) / 2;
 }
-// Étape 2: Première série de papillons (butterflies)
+// Étape 2
 void etape2_idct_rapide(double x[8], double y[8], double c6_1, double c6_2){
     y[0] = (x[0] + x[1])/2;
     y[1] = (x[0] - x[1])/2;
     double calcul = c6_1 * (x[3] + x[2]);
-    y[2] = ((c6_2 - c6_1) * x[2] + calcul) * INV_SQRT2;
-    y[3] = (-(c6_2 + c6_1) * x[3] + calcul) * INV_SQRT2;
+    y[2] = (-(c6_2 + c6_1) * x[3] + calcul) * INV_SQRT2;
+    y[3] = ((c6_2 - c6_1) * x[2] + calcul) * INV_SQRT2;
     y[4] = (x[4] + x[6]) / 2;
     y[5] = (x[7] - x[5]) / 2;
     y[6] = (x[4] - x[6]) / 2;
     y[7] = (x[7] + x[5]) / 2;
 }
 
-// Étape 3: Deuxième série de papillons avec rotations
+// Étape 3
 void etape3_idct_rapide(double x[8], double y[8], double c1_1, double c1_2, double c3_1, double c3_2){
     y[0] = (x[0] + x[3])/2;
     y[1] = (x[1] + x[2])/2;
@@ -87,7 +87,7 @@ void etape3_idct_rapide(double x[8], double y[8], double c1_1, double c1_2, doub
     y[7] = (c3_2 - c3_1) * x[4] + calcul2;
 }
 
-// Étape 4: Opérations finales pour préparer la sortie
+// Étape 4
 void etape4_idct_rapide(double x[8], double y[8]){
     y[0] = (x[0] + x[7]) / 2;
     y[1] = (x[1] + x[6]) / 2;
