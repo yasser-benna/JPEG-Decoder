@@ -1,7 +1,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include "../include/upsampling.h"
+#include "upsampling.h"
 #define N 8
 
 //Up_sampling 4:2:2 horizontal

@@ -2,8 +2,8 @@
 #include <stdlib.h> 
 #include <stdint.h>   
 #include <string.h>  
-#include "../include/huffman.h"
-#include "../include/bitsmanip.h"
+#include "huffman.h"
+#include "bitsmanip.h"
 
 /*La fonction read_bit permet de lire bit par bit à partir d'une position. Elle traite aussi le cas 
 du Byte Stuffing mentionné dans le sujet .*/

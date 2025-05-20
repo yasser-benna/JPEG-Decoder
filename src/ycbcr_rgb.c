@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
-#include "../include/ycbcr_rgb.h"
-#include "../include/reader.h"
+#include "ycbcr_rgb.h"
+#include "reader.h"
 
 /*La fonction YCbCr_to_rgb permet la conversion de YCbCr en RGB en se basant sur les formules simplifiées fournies. Sans
 oublier également les conditions de saturation.*/

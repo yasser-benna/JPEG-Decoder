@@ -1,9 +1,9 @@
 #include <stdlib.h>
 #include <stdio.h>
-#include "../include/bitsmanip.h"
+#include "bitsmanip.h"
 
 
-// Function to initialize a BitStream structure
+// Fonction pour initialiser une structure de  BitStram 
 BitStream* bitstream_init(const char* filename) {
     BitStream* bs = (BitStream*)malloc(sizeof(BitStream));
     if (!bs) return NULL;
@@ -18,7 +18,7 @@ BitStream* bitstream_init(const char* filename) {
     bs->is_eof = 0;
     return bs;
 }
-// Function to close a BitStream structure
+// Fonction pour fermer une structure de BitStream
 void bitstream_close(BitStream* bs) {
     if (bs) {
         if (get_fp(*bs)) {
@@ -28,7 +28,7 @@ void bitstream_close(BitStream* bs) {
     }
 }
 
-// Function to fill the buffer with data from the file
+// Fonction pour remplir Buffer des données du fichier 
 static void bitstream_fill_buffer(BitStream* bs) {
     if (get_bits_available(*bs) == 0 && !get_is_eof(*bs)) {
         int byte = fgetc(get_fp(*bs));
@@ -41,38 +41,38 @@ static void bitstream_fill_buffer(BitStream* bs) {
         }
     }
 }
-// Function to read a single bit from the buffer
+// Fonction pour lire un bit du Buffer 
 uint8_t bitstream_read_bit(BitStream* bs) {
     bitstream_fill_buffer(bs);
     if (get_bits_available(*bs) == 0) {
-        return 0; // EOF or error
+        return 0; // EOF ou error
     }
-    // Get the most significant bit
+    // Obtenir le bit de poids fort 
     uint8_t bit = (get_buffer(*bs) >> 7) & 1;
-    // Shift buffer left by 1
+    // Décalage à gauche par 1
     bs->buffer <<= 1;
     bs->bits_available--;
     return bit;
 }
 
-// Function to read n bits from the buffer
+// Fonction pour lire n bits du Buffer
 uint32_t bitstream_read_bits(BitStream* bs, int n) {
     uint32_t result = 0;
     for (int i = 0; i < n; i++) {
-        result = (result << 1) | bitstream_read_bit(bs);//8(0)and sets the ones
+        result = (result << 1) | bitstream_read_bit(bs);//met 8 zéros et remplace par 1 les bits non nuls 
     }
     return result;
 }
-// Function to peek n bits from the buffer without consuming them
+// Fonction pour voir n bits du Buffer sans les consommer 
 uint32_t bitstream_peek_bits(BitStream* bs, int n) {
-    // Save current state
+    // Sauvegarder l'état courant
     uint8_t saved_buffer = get_buffer(*bs);
     int saved_bits = get_bits_available(*bs);
-    long saved_pos = ftell(get_fp(*bs));// or bs->bytes_read
+    long saved_pos = ftell(get_fp(*bs));// ou bs->bytes_read
     int saved_eof = get_is_eof(*bs);
-    // Read bits
+    // lire bits
     uint32_t result = bitstream_read_bits(bs, n);
-    // Restore state
+    // Restorer l'état 
     bs->buffer = saved_buffer;
     bs->bits_available = saved_bits;
     fseek(bs->fp, saved_pos, SEEK_SET);
@@ -81,30 +81,30 @@ uint32_t bitstream_peek_bits(BitStream* bs, int n) {
 }
 
 
-// fuction to get fp from BitStream
+// Fonction pour avoir fp du BitStream
 FILE*get_fp(BitStream bs){
     return bs.fp;
 }
 
-// function to get buffer from BitStream
+// Fonction pour avoir buffer  du BitStream
 uint8_t get_buffer(BitStream bs){
     return bs.buffer;
 
 }
-// function to get bits_available from BitStream
+// Fonction pour avoir les bits disponibles du BitStream 
 int get_bits_available(BitStream bs){
     return bs.bits_available;
 }
-// function to get bytes_read from BitStream
+// Fonction pour avoir les octets lues du BitStream
 long get_bytes_read(BitStream bs){
     return bs.bytes_read;
 }
-// function to get is_eof from BitStream
+// Fonction pour avoir la valeur de is_oef 
 int get_is_eof(BitStream bs){
     return bs.is_eof;
 }
 
-// Test functions
+// Test des fonctions
 
 // int main(){
 //     BitStream*bs=bitstream_init("images/invader.jpeg");

@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "../include/zigzag.h"
+#include "zigzag.h"
 #include <stdint.h>  
  /*
   La fonction inverse_zigzag reconstruit une matrice 8×8 bloc à partir d'un vecteur de 64 éléments.
