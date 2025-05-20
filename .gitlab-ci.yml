@@ -46,4 +46,5 @@ test-nb-absolu:
     - echo $(pwd)/images/invader.jpeg # regardez, un chemin absolu !
     - ./jpeg2ppm $(pwd)/images/invader.jpeg
     - test -f $(pwd)/images/invader.pgm # on vérifie que le fichier de sortie existe
+    - ls -al $(pwd)/images/
     - set +x
