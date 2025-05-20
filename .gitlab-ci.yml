@@ -41,10 +41,7 @@ test-nb-relatif:
 test-nb-absolu:
   stage: test       # s'exécute à l'étape 'test'
   script:
-    - set -x
     - mkdir -p out  # on crée le répertoire de sortie
     - echo $(pwd)/images/invader.jpeg # regardez, un chemin absolu !
     - ./jpeg2ppm $(pwd)/images/invader.jpeg
-    - ls -al $(pwd)/images/
     - test -f $(pwd)/images/invader.pgm # on vérifie que le fichier de sortie existe
-    - set +x
