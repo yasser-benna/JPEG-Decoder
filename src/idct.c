@@ -64,8 +64,9 @@ void etape1_idct_rapide_double(double x[8], double y[8]){
 void etape2_idct_rapide(double x[8], double y[8], double c6_1, double c6_2){
     y[0] = (x[0] + x[1])/2;
     y[1] = (x[0] - x[1])/2;
-    y[2] = (c6_1 * x[2] - c6_2 * x[3]) * INV_SQRT2;
-    y[3] = (c6_1 * x[3] + c6_2 * x[2]) * INV_SQRT2;
+    double calcul = c6_1 * (x[3] + x[2]);
+    y[2] = ((c6_2 - c6_1) * x[2] + calcul) * INV_SQRT2;
+    y[3] = (-(c6_2 + c6_1) * x[3] + calcul) * INV_SQRT2;
     y[4] = (x[4] + x[6]) / 2;
     y[5] = (x[7] - x[5]) / 2;
     y[6] = (x[4] - x[6]) / 2;
@@ -78,10 +79,12 @@ void etape3_idct_rapide(double x[8], double y[8], double c1_1, double c1_2, doub
     y[1] = (x[1] + x[2])/2;
     y[2] = (x[1] - x[2]) / 2;
     y[3] = (x[0] - x[3]) / 2;
-    y[4] = c3_1 * x[4] - c3_2 * x[7];
-    y[5] = c1_1 * x[5] - c1_2 * x[6];
-    y[6] = c1_1 * x[6] + c1_2 * x[5];
-    y[7] = c3_1 * x[7] + c3_2 * x[4];
+    double calcul1 = c1_1 * (x[5] + x[6]);
+    double calcul2 = c3_1 * (x[4] + x[7]);
+    y[4] = -(c3_2 + c3_1) * x[7] + calcul2;
+    y[5] = -(c1_2 + c1_1) * x[6] + calcul1;
+    y[6] = (c1_2 - c1_1) * x[5] + calcul1;
+    y[7] = (c3_2 - c3_1) * x[4] + calcul2;
 }
 
 // Étape 4: Opérations finales pour préparer la sortie
