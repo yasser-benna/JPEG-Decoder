@@ -52,16 +52,17 @@ do
     echo "Conversion réussie de $filename en $output_file"
     count=$((count+1))
 
-    eog "$OUTPUT_DIR/$output_file"
+    # eog "$OUTPUT_DIR/$output_file"
     echo "------------------------------"
 done
 
 # Résumé
 echo "Conversion terminée : $count fichiers sur $total_files."
-
+read -p "Appuyez sur Entrée pour continuer..."
 # Nettoyage
 rm -f "$TMP_FILE_LIST"
 rm -f ./images/*.ppm ./images/*.pgm
+rm ./images/*.blabla
 make clean > /dev/null
 read -p "Appuyez sur Entrée pour quitter..."
 clear

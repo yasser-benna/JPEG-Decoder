@@ -6,8 +6,8 @@
 
 //Up_sampling 4:2:2 horizontal
 void up_sampling4_2_2_horizontal(uint8_t **C, uint8_t ***new_C, int H_Y, int V_Y){
-    *new_C = malloc(N * V_Y * sizeof(uint8_t*));
-    for (int i = 0; i < V_Y * N; i++) {
+    *new_C = malloc(N * sizeof(uint8_t*));
+    for (int i = 0; i < N; i++) {
         (*new_C)[i] = malloc(N * H_Y * sizeof(uint8_t));
         
     }
@@ -24,7 +24,7 @@ void up_sampling4_2_2_horizontal(uint8_t **C, uint8_t ***new_C, int H_Y, int V_Y
 void up_sampling4_2_2_vertical(uint8_t**C,uint8_t ***new_C, int H_Y, int V_Y){
     *new_C = malloc(V_Y * N * sizeof(uint8_t*));
     for (int i = 0; i < V_Y * N; i++) {
-        (*new_C)[i] = malloc(H_Y * N * sizeof(uint8_t));
+        (*new_C)[i] = malloc(N * sizeof(uint8_t));
         
     }
     for (int i = 0; i < N; i++) {

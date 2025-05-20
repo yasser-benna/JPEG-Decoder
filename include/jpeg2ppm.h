@@ -7,3 +7,4 @@ typedef enum {
     SAMPLING_420 = 3,     // Format 4:2:0
     SAMPLING_UNSUPPORTED = -1 // Format non supporté
 } SamplingFormat;
+void print_bloc(uint8_t **bloc, int mcu_index, char * component, int H_Y, int V_Y);

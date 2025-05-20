@@ -58,10 +58,22 @@ void YCbCr_to_rgb(uint8_t ***Y_bloc, uint8_t ***Cb_bloc, uint8_t ***Cr_bloc,
                 int g = Y - 0.34414 * (cb - 128) - 0.71414 * (cr - 128);
                 int b = Y + 1.772 * (cb - 128);
 
-                // Conditions de saturation 
-                (*R)[global_ligne][global_colonne] = (r < 0) ? 0 : ((r > 255) ? 255 : r);
-                (*G)[global_ligne][global_colonne] = (g < 0) ? 0 : ((g > 255) ? 255 : g);
-                (*B)[global_ligne][global_colonne] = (b < 0) ? 0 : ((b > 255) ? 255 : b);
+                // Conditions de saturation
+                if (sampling == 2 && nb_block_C > 1){
+                    (*R)[global_ligne][(i % H_Y) * 8 + colonne] = (r < 0) ? 0 : ((r > 255) ? 255 : r);
+                    (*G)[global_ligne][(i % H_Y) * 8 + colonne] = (g < 0) ? 0 : ((g > 255) ? 255 : g);
+                    (*B)[global_ligne][(i % H_Y) * 8 + colonne] = (b < 0) ? 0 : ((b > 255) ? 255 : b);
+                }
+                else if (sampling == 1 && nb_block_C > 1){
+                    (*R)[(int)(i / V_Y) * 8 + ligne][global_colonne] = (r < 0) ? 0 : ((r > 255) ? 255 : r);
+                    (*G)[(int)(i / V_Y) * 8 + ligne][global_colonne] = (g < 0) ? 0 : ((g > 255) ? 255 : g);
+                    (*B)[(int)(i / V_Y) * 8 + ligne][global_colonne] = (b < 0) ? 0 : ((b > 255) ? 255 : b);
+                }
+                else {
+                    (*R)[global_ligne][global_colonne] = (r < 0) ? 0 : ((r > 255) ? 255 : r);
+                    (*G)[global_ligne][global_colonne] = (g < 0) ? 0 : ((g > 255) ? 255 : g);
+                    (*B)[global_ligne][global_colonne] = (b < 0) ? 0 : ((b > 255) ? 255 : b);
+                }
             }
         }
     }

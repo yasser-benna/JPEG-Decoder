@@ -166,37 +166,37 @@ int traitement_color(IMAGE* image, IMAGE_D* image_d){
         }
         YCbCr_to_rgb(Y_final[mcu], Cb_final[mcu], Cr_final[mcu], &R, &G, &B, H_Y, V_Y, nb_blocs_Y, nb_blocs_Cb, forbloc);
         copy_mcu_to_image(image_d, R, G, B, mcu, nb_mcus_x, H_Y, V_Y);
-        // Free RGB arrays
-        for (int i = 0; i < 8 * V_Y; i++) {
-            free(R[i]);
-            free(G[i]);
-            free(B[i]);
-        }
-        free(R);
-        free(G);
-        free(B);
-        //free Yfinal, Cb_final, Cr_final
-        for (int b = 0; b < nb_blocs_Y; b++) {
-            for (int i = 0; i <8; i++) {
-                free(Y_final[mcu][b][i]);
-            }
-            free(Y_final[mcu][b]);
-        }
-        free(Y_final[mcu]);
-        for (int b = 0; b < nb_blocs_Cb; b++) {
-            for(int i=0;i< V_Y*8;i++){
-                free(Cb_final[mcu][b][i]);
-            }
-            free(Cb_final[mcu][b]);
-        }
-        free(Cb_final[mcu]);
-        for (int b = 0; b < nb_blocs_Cr; b++) {
-            for(int i=0;i< V_Y*8;i++){
-                free(Cr_final[mcu][b][i]);
-            }
-            free(Cr_final[mcu][b]);
-        }
-        free(Cr_final[mcu]);
+        // // Free RGB arrays
+        // for (int i = 0; i < 8 * V_Y; i++) {
+        //     free(R[i]);
+        //     free(G[i]);
+        //     free(B[i]);
+        // }
+        // free(R);
+        // free(G);
+        // free(B);
+        // //free Yfinal, Cb_final, Cr_final
+        // for (int b = 0; b < nb_blocs_Y; b++) {
+        //     for (int i = 0; i <8; i++) {
+        //         free(Y_final[mcu][b][i]);
+        //     }
+        //     free(Y_final[mcu][b]);
+        // }
+        // free(Y_final[mcu]);
+        // for (int b = 0; b < nb_blocs_Cb; b++) {
+        //     for(int i=0;i< V_Y*8;i++){
+        //         free(Cb_final[mcu][b][i]);
+        //     }
+        //     free(Cb_final[mcu][b]);
+        // }
+        // free(Cb_final[mcu]);
+        // for (int b = 0; b < nb_blocs_Cr; b++) {
+        //     for(int i=0;i< V_Y*8;i++){
+        //         free(Cr_final[mcu][b][i]);
+        //     }
+        //     free(Cr_final[mcu][b]);
+        // }
+        // free(Cr_final[mcu]);
     }
     for (int i = 0; i < 8; i++) {
         free(Y_bloc[i]);
