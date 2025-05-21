@@ -27,7 +27,7 @@ int traitement_color(IMAGE* image, IMAGE_D* image_d){
     else {
         forbloc=SAMPLING_UNSUPPORTED;
         fprintf(stderr, "Forbloc de sous-échantillonnage non supporté.\n");
-        exit(1);
+        exit(4);
     }
     char** huffman_dc_Y = generer_codes_huffman( image->HUFFMAN_tables[0].tailles, image->HUFFMAN_tables[0].nb_symbols);
     char** huffman_ac_Y = generer_codes_huffman( image->HUFFMAN_tables[2].tailles, image->HUFFMAN_tables[2].nb_symbols);
@@ -35,7 +35,7 @@ int traitement_color(IMAGE* image, IMAGE_D* image_d){
     char** huffman_ac_C = generer_codes_huffman( image->HUFFMAN_tables[3].tailles, image->HUFFMAN_tables[3].nb_symbols);
     if (!huffman_dc_Y || !huffman_ac_Y || !huffman_dc_C || !huffman_ac_C) {
         fprintf(stderr, "Error generating Huffman tables\n");
-        exit(1);
+        exit(4);
     }
 
     int nb_mcus_x = (image->Largeur + 8 * H_Y - 1) / (8 * H_Y);
@@ -60,7 +60,7 @@ int traitement_color(IMAGE* image, IMAGE_D* image_d){
         );
     if (!Y_blocs || !Cb_blocs || !Cr_blocs) {
         fprintf(stderr, "Block extraction failed\n");
-        exit(1);
+        exit(4);
     }
     //Décodage du composant Y
     uint8_t ****Y_final = malloc(total_mcus * sizeof(uint8_t***));
@@ -68,7 +68,7 @@ int traitement_color(IMAGE* image, IMAGE_D* image_d){
     uint8_t ****Cr_final = malloc(total_mcus * sizeof(uint8_t***));
     if (!Y_final || !Cb_final || !Cr_final) {
         fprintf(stderr, "Memory allocation failed\n");
-        exit(1);
+        exit(4);
     }
     // allouer les blocs courants
     int16_t **Y_bloc = malloc(8 * sizeof(int16_t*));
@@ -81,7 +81,7 @@ int traitement_color(IMAGE* image, IMAGE_D* image_d){
         cr_bloc[i] = malloc(8 * sizeof(int16_t));
         if (!Y_bloc[i] || !cb_bloc[i] || !cr_bloc[i]) {
             fprintf(stderr, "Memory allocation failed\n");
-            exit(1);
+            exit(4);
         }
     }
     // Traiter chaque MCU
@@ -101,7 +101,7 @@ int traitement_color(IMAGE* image, IMAGE_D* image_d){
         Cr_final[mcu] = malloc(nb_blocs_Cr * sizeof(uint8_t**));
         if (!Cb_final[mcu] || !Cr_final[mcu]){
             fprintf(stderr, "Memory allocation failed\n");
-            exit(1);
+            exit(4);
         }
         for (int b = 0; b < nb_blocs_Cb; b++) {
             quantification_inverse(Cb_blocs[mcu][b], image->Quant_Table[1]);
@@ -124,7 +124,7 @@ int traitement_color(IMAGE* image, IMAGE_D* image_d){
                     break;
                 default:
                     fprintf(stderr, "Unsupported sampling format for Cb\n");
-                    exit(1);
+                    exit(4);
             }
             if (free_cb_spatial) {
                 for (int i = 0; i < 8; i++) {
@@ -155,7 +155,7 @@ int traitement_color(IMAGE* image, IMAGE_D* image_d){
                     break;
                 default:
                     fprintf(stderr, "Unsupported sampling format for Cr\n");
-                    exit(1);
+                    exit(4);
             }
             if (free_cr_spatial) {
                 for (int i = 0; i < 8; i++) {

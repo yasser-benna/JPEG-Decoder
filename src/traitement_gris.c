@@ -27,7 +27,7 @@ int traitement_grayscale(IMAGE* image,IMAGE_D*image_d){
         
     if (!huffman_dc || !huffman_ac) {
         fprintf(stderr, "Erreur de génération des tables Huffman au MCU \n");
-        exit(1);
+        exit(5);
     }
 
     bloc_ap = malloc(8 * sizeof(int*));

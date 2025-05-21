@@ -8,7 +8,7 @@ char* create_output_filename(const char* input_path,int flag) {
     if (!output_filename) {
         free(output_filename);
         fprintf(stderr, "Memory allocation failed create_output_filename\n");
-        exit(1);
+        exit(2);
     }
     strcpy(output_filename, input_path);
     char* last_dot = strrchr(output_filename, '.');
@@ -22,5 +22,5 @@ char* create_output_filename(const char* input_path,int flag) {
         }
         return output_filename;
     }
-    exit(1);
+    exit(2);
 }

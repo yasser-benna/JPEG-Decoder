@@ -18,7 +18,7 @@
 IMAGE* init_image() {
     IMAGE* img = malloc(sizeof(IMAGE));
     if (!img) {
-        printf("Erreur d'allocation IMAGE\n");
+        fprintf(stderr,"Erreur d'allocation IMAGE\n");
         exit(1);
     }
     img->Largeur = 0;
@@ -64,8 +64,8 @@ void free_image(IMAGE* img) {
 IMAGE* read_jpeg(const char* file_name){
     BitStream* bs=bitstream_init(file_name);
     if(bs==NULL){
-        printf("ERROR FILE OPEN\n");
-        exit(0);
+        fprintf(stderr,"ERROR FILE OPEN\n");
+        exit(3);
 
     }
     IMAGE*image=init_image();
@@ -93,8 +93,8 @@ IMAGE* read_jpeg(const char* file_name){
                 read_sos(bs,image);
                 break;
             default:
-                printf("ERROR MARQUEUR JPEG\n");
-                exit(0);
+                fprintf(stderr,"ERROR MARQUEUR JPEG %4hx\n",MARQUEUR);
+                exit(3);
         }
         MARQUEUR=bitstream_peek_bits(bs,16);
     }while (MARQUEUR!=EOI);
@@ -107,8 +107,8 @@ void read_soi(BitStream*bs){
     uint16_t marqueur=0;
     marqueur=bitstream_read_bits(bs,16);
     if(marqueur!=SOI){
-        printf("ERROR SOI\n");
-        exit(0);
+        fprintf(stderr,"ERROR SOI\n");
+        exit(3);
     } 
 }
 // Fonction pour vérifier la section EOI
@@ -116,8 +116,8 @@ void read_eoi(BitStream*bs){
     uint16_t marqueur=0;
     marqueur=bitstream_read_bits(bs,16);
     if(marqueur!=EOI){
-        printf("ERROR EOI\n");
-        exit(0);
+        fprintf(stderr,"ERROR EOI\n");
+        exit(3);
     }
 }
 // Fonction pour vérifier la section APPX
@@ -125,44 +125,44 @@ void read_appx(BitStream*bs,IMAGE*image){
     uint16_t marqueur=0;
     marqueur=bitstream_read_bits(bs,16);
     if(marqueur!=APP0){
-        printf("ERROR APP0\n");
-        exit(0);
+        fprintf(stderr,"ERROR APP0\n");
+        exit(3);
     }
     uint16_t section_size=bitstream_read_bits(bs,16);
     uint8_t byter=bitstream_read_bits(bs,8);
     if(byter!=0x4a){
-        printf("ERROR APPX J\n");
-        exit(0);
+        fprintf(stderr,"ERROR APPX J\n");
+        exit(3);
     }
     byter=bitstream_read_bits(bs,8);
     if(byter!=0x46){
-        printf("ERROR APPX F\n");
-        exit(0);
+        fprintf(stderr,"ERROR APPX F\n");
+        exit(3);
     }
     byter=bitstream_read_bits(bs,8);
     if(byter!=0x49){
-        printf("ERROR APPX I\n");
-        exit(0);
+        fprintf(stderr,"ERROR APPX I\n");
+        exit(3);
     }
     byter=bitstream_read_bits(bs,8);
     if(byter!=0x46){
-        printf("ERROR APPX F\n");
-        exit(0);
+        fprintf(stderr,"ERROR APPX F\n");
+        exit(3);
     }
     byter=bitstream_read_bits(bs,8);
     if(byter!=0x00){
-        printf("ERROR APPX 00\n");
-        exit(0);
+        fprintf(stderr,"ERROR APPX 00\n");
+        exit(3);
     }
     byter=bitstream_read_bits(bs,8);
     if(byter!=0x01){
-        printf("ERROR APPX 01\n");
-        exit(0);
+        fprintf(stderr,"ERROR APPX 01\n");
+        exit(3);
     }
     byter=bitstream_read_bits(bs,8);
     if(byter!=0x01){
-        printf("ERROR APPX 01\n");
-        exit(0);
+        fprintf(stderr,"ERROR APPX 01\n");
+        exit(3);
     }
     image->APPX=0;
     bitstream_read_bits(bs,(section_size-9)*8);
@@ -172,8 +172,8 @@ void read_com(BitStream*bs,IMAGE*image){
     uint16_t marqueur=0;
     marqueur=bitstream_read_bits(bs,16);
     if(marqueur!=COM){
-        printf("ERROR COM\n");
-        exit(0);
+        fprintf(stderr,"ERROR COM\n");
+        exit(3);
     }
     uint16_t section_size=bitstream_read_bits(bs,16);
     image->COMMENTAIRE=malloc((section_size-1)*sizeof(char));
@@ -189,8 +189,8 @@ void read_dqt(BitStream*bs,IMAGE*image){
     uint16_t marqueur=0;
     marqueur=bitstream_read_bits(bs,16);
     if(marqueur!=DQT){
-        printf("ERROR DQT\n");
-        exit(0);
+        fprintf(stderr,"ERROR DQT\n");
+        exit(3);
     }
     uint16_t section_size=bitstream_read_bits(bs,16)-2;
     uint8_t table_nb=(uint8_t)section_size/65;
@@ -202,8 +202,8 @@ void read_dqt(BitStream*bs,IMAGE*image){
         precision=bitstream_read_bits(bs,4);
         table_id=bitstream_read_bits(bs,4);
         if(table_id>3){
-            printf("ERROR: Invalid quantization table ID %d\n", table_id);
-            exit(0);
+            fprintf(stderr,"ERROR: Invalid quantization table ID %d\n", table_id);
+            exit(3);
         }
         // inutile mais peut etre dans le mode progressif 
         if(precision==0){
@@ -224,26 +224,25 @@ void read_sofx(BitStream*bs,IMAGE*image){
     uint16_t marqueur=0;
     marqueur=bitstream_read_bits(bs,16);
     if(marqueur!=SOF0){
-        printf("ERROR SOF0\n");
-        exit(0);
+        fprintf(stderr,"ERROR SOF0\n");
+        exit(3);
     }
     uint16_t section_size=bitstream_read_bits(bs,16);
     uint16_t section_counter=2;
     uint8_t precision=bitstream_read_bits(bs,8);
     section_counter++;
     if(precision!=8){
-        printf("ERROR PRECISON SOFX\n");
-        exit(0);
+        fprintf(stderr,"ERROR PRECISON SOFX\n");
+        exit(3);
     }
     image->Hauteur=bitstream_read_bits(bs,16);
     image->Largeur=bitstream_read_bits(bs,16);
     image->nb_components+=bitstream_read_bits(bs,8);
     section_counter+=5;
     if(image->nb_components>3){
-        printf("ERROR SOFX NB_COMPONENTS\n");
-        exit(0);
+        fprintf(stderr,"ERROR SOFX NB_COMPONENTS\n");
+        exit(3);
     }
-//    image->COMPONENTS=malloc(image->nb_components * sizeof(COMPONENT));
     for(uint8_t i=0;i<image->nb_components;i++){
         (&(image->COMPONENTS[i]))->id=bitstream_read_bits(bs,8);
         (&(image->COMPONENTS[i]))->h_factor=bitstream_read_bits(bs,4);
@@ -252,8 +251,8 @@ void read_sofx(BitStream*bs,IMAGE*image){
         section_counter+=3;
     }
     if(section_counter!=section_size){
-        printf("ERROR SOF0 section size mismatch\n");
-        exit(0);
+        fprintf(stderr,"ERROR SOF0 section size mismatch\n");
+        exit(3);
     }
 
 }
@@ -262,8 +261,8 @@ void read_dht(BitStream*bs,IMAGE*image){
     uint16_t marqueur=0;
     marqueur=bitstream_read_bits(bs,16);
     if(marqueur!=DHT){
-        printf("ERROR DHT\n");
-        exit(0);
+        fprintf(stderr,"ERROR DHT\n");
+        exit(3);
     }
     uint16_t section_size=bitstream_read_bits(bs,16);
     uint16_t byter=2;
@@ -273,15 +272,15 @@ void read_dht(BitStream*bs,IMAGE*image){
     int total_symbols = 0;
     while(byter<section_size){
         if(bitstream_read_bits(bs,3)!=0){
-        printf("ERROR DHT 000\n");
-        exit(0);
+        fprintf(stderr,"ERROR DHT 000\n");
+        exit(3);
         }
         AC_DC=bitstream_read_bit(bs);
         table_id=bitstream_read_bits(bs,4);
         byter++;
         if(table_id>3){
-            printf("ERROR DHT TABLE ID %u\n",table_id);
-            exit(0);
+            fprintf(stderr,"ERROR DHT TABLE ID %u\n",table_id);
+            exit(3);
         }
         current_table = &(image->HUFFMAN_tables[table_id + (AC_DC *2)]);
         current_table->id = table_id;
@@ -294,8 +293,8 @@ void read_dht(BitStream*bs,IMAGE*image){
         }
         current_table->nb_symbols = total_symbols;
         if(total_symbols > 256){
-            printf("ERROR: Too many symbols in Huffman table\n");
-            exit(0);
+            fprintf(stderr,"ERROR: Too many symbols in Huffman table\n");
+            exit(3);
         }
         for(int i=0; i<total_symbols; i++){
             current_table->symbols[i] = bitstream_read_bits(bs,8);
@@ -308,8 +307,8 @@ void read_sos(BitStream*bs,IMAGE*image){
     uint16_t marqueur =0;
     marqueur= bitstream_read_bits(bs, 16);
     if(marqueur != SOS){
-        printf("ERROR SOS\n");
-        exit(0);
+        fprintf(stderr,"ERROR SOS\n");
+        exit(3);
     }
     uint16_t section_size = bitstream_read_bits(bs, 16);
     uint16_t section_counter=2;
@@ -327,8 +326,8 @@ void read_sos(BitStream*bs,IMAGE*image){
     image->Al = bitstream_read_bits(bs, 4);
     section_counter += 4;
     if(section_counter != section_size){
-        printf("ERROR SOS section size mismatch\n");
-        exit(0);
+        fprintf(stderr,"ERROR SOS section size mismatch\n");
+        exit(3);
     }
 
     size_t compressed_data_buffer_size = 1024*1024;

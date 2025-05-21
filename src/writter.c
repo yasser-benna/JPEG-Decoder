@@ -7,7 +7,7 @@ IMAGE_D* init_image_d(int width, int height, int colors) {
     IMAGE_D* image = malloc(sizeof(IMAGE_D));
     if (!image) {
         fprintf(stderr, "Erreur d'allocation IMAGE_D\n");
-        exit(1);
+        exit(6);
     }
     if(colors == 0){
         image->R = malloc(height * sizeof(uint8_t*));
