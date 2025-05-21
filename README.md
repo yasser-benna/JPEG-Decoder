@@ -24,7 +24,7 @@ Dans ce projet on a pu implémenter un décodeur JPEG en langage C. Il permet de
 
 **BENNA YASSER**
 
--Implémentation de l'algorithme de quantification inverse
+\- Implémentation de l'algorithme de quantification inverse
 
 \- Développement des versions naïve et optimisée de la transformation DCT inverse
 
@@ -34,7 +34,7 @@ Dans ce projet on a pu implémenter un décodeur JPEG en langage C. Il permet de
 
 **TROMBATI MOHAMED**
 
-Implémentation de l'algorithme zig-zag inverse
+\- Implémentation de l'algorithme zig-zag inverse
 
 \- Elaboration du décodage Huffman
 
@@ -49,8 +49,37 @@ Notre approche a été fondée sur une collaboration étroite et régulière. Le
 La répartition des tâches a été effectuée en tenant compte des compétences de chacun tout en veillant à maintenir un équilibre dans la charge de travail. Cette organisation nous a permis d'avancer méthodiquement et de minimiser les retards potentiels.
 
 ------------------------------------------------------------------------
+### Graphe de dependance
 
-### Details pour chaque mission
+jpeg2ppm.c (main)
+├── reader.c
+│   └── bitsmanip.c
+├── output_file.c
+├── writter.c
+├── traitement_gris.c
+│   ├── huffman.c
+│   │   └── bitsmanip.c
+│   ├── zigzag.c
+│   ├── iqzz.c
+│   ├── idct.c
+├── traitement_couleur.c
+│   ├── huffman.c
+│   │   └── bitsmanip.c
+│   ├── zigzag.c
+│   ├── iqzz.c
+│   ├── idct.c
+│   ├── upsampling.c
+│   ├── ycbcr_rgb.c
+│   └── extraction_bloc.c
+│       └── huffman.c
+│           └── bitsmanip.c
+
+------------------------------------------------------------------------
+### Détails pour chaque mission
+
+#### Point d'entrée et orchestration générale (jpeg2ppm.c)
+
+Le fichier principal `jpeg2ppm.c` constitue le point d'entrée du programme. Il gère la lecture des arguments, l'ouverture du fichier JPEG, l'appel aux fonctions de décodage couleur ou niveaux de gris selon le nombre de composantes, la création du nom de fichier de sortie, l'écriture de l'image décodée au format approprié (PGM ou PPM), et la libération de la mémoire. Il orchestre l'ensemble du pipeline de décodage en appelant les modules spécialisés pour chaque étape.
 
 #### Gestion du BitStream (bitsmanip.c)
 
@@ -92,6 +121,18 @@ Le module de transformation en cosinus discrète inverse (IDCT) constitue l'épi
 
 Le module de quantification inverse représente une étape fondamentale dans la chaîne de décodage JPEG, responsable de la restauration de l'amplitude des coefficients DCT qui avaient été réduits lors de la compression. L'implémentation se caractérise par sa simplicité élégante et son efficacité algorithmique. La fonction `quantification_inverse` opère directement sur un bloc linéarisé de 64 coefficients DCT et utilise une table de quantification spécifique fournie en paramètre. Le principe mathématique sous-jacent est une simple multiplication terme à terme: chaque coefficient DCT est multiplié par la valeur correspondante dans la table de quantification. Cette opération inverse la division effectuée lors de la compression, restaurant ainsi progressivement les détails de l'image qui avaient été altérés par le processus de quantification. La structure bidimensionnelle implicite du bloc est préservée grâce à un calcul d'indice approprié (`i * N + j`), permettant d'accéder aux éléments correspondants dans le tableau linéaire. L'implémentation présente une complexité algorithmique optimale de O(n²), avec exactement 64 multiplications pour un bloc standard 8×8, sans opérations superflues. Ce module travaille en tandem avec le module de zig-zag inverse: typiquement, les coefficients sont d'abord ordonnés selon l'ordre zigzag conventionnel, puis passés à cette fonction pour la dé-quantification. La précision numérique est maintenue par l'utilisation du type `int` pour les coefficients, offrant une plage dynamique suffisante pour accommoder l'expansion des valeurs qui résulte de la multiplication par les facteurs de quantification, ces derniers étant codés sur 16 bits (type `uint16_t`). Cette approche garantit que l'information fréquentielle essentielle, particulièrement les composantes de basse fréquence cruciales pour la qualité perçue de l'image, est fidèlement restituée avant l'application de la transformation DCT inverse. Le module démontre une conception sobre et directe, privilégiant l'efficacité et la clarté, tout en constituant un maillon indispensable dans la reconstruction de l'image compressée.
 
+#### Transformation zigzag inverse (zigzag.c)
+
+Le module de transformation zigzag inverse constitue une étape fondamentale dans le processus de décodage JPEG, responsable de la reconstitution spatiale des coefficients DCT préalablement linéarisés selon un parcours spécifique optimisé pour la compression. 
+L'implémentation s'articule autour de la fonction `inverse_zigzag` qui opère méthodiquement en transformant un vecteur unidimensionnel de 64 éléments en une matrice bidimensionnelle 8×8, restaurant ainsi la disposition spatiale originale des coefficients fréquentiels. 
+Le cœur algorithmique exploite une propriété mathématique élégante : tous les éléments situés sur une même diagonale partagent une valeur identique pour la somme de leurs indices de ligne et de colonne. 
+L'algorithme procède par un parcours séquentiel des 15 diagonales possibles (représentées par la somme ligne+colonne variant de 0 à 14), en alternant systématiquement entre deux types de trajectoires selon la parité de cette somme. 
+Lorsque la somme est paire, le module parcourt la diagonale du bas vers le haut (de bas-gauche vers haut-droit), tandis que lorsqu'elle est impaire, il parcourt la diagonale du haut vers le bas (de haut-gauche vers bas-droit). 
+Cette logique bidirectionnelle reflète exactement l'inverse du parcours zigzag utilisé lors de la compression, qui concentre les coefficients non-nuls en début de séquence. 
+L'implémentation démontre une concision remarquable avec seulement quatre variables de contrôle (`i` pour l'indice du vecteur, `ligne` et `col` pour les coordonnées matricielles, et `slc` pour la somme ligne+colonne), articulées autour de deux boucles imbriquées qui sélectionnent la direction de parcours appropriée selon la parité. 
+Des vérifications de bornes (`ligne < 8 && col < 8`) garantissent que seules les positions valides de la matrice 8×8 sont accédées. 
+Cette transformation est essentielle pour préparer les coefficients à l'étape de quantification inverse puis à la DCT inverse, contribuant ainsi directement à la reconstruction fidèle de l'image d'origine à partir de sa représentation compressée.
+
 #### Gestion des fichiers de sortie (output_file.c)
 
 Le module de gestion des fichiers de sortie représente une composante auxiliaire mais néanmoins essentielle du décodeur JPEG, assurant la transition fluide entre les formats d'entrée et de sortie. L'implémentation se concentre autour de la fonction `create_output_filename` qui transforme intelligemment le chemin d'accès d'un fichier JPEG d'entrée en un nom de fichier approprié pour l'image décodée. Cette fonction opère selon une logique précise de manipulation de chaînes de caractères: elle localise d'abord la dernière occurrence d'un point dans le nom du fichier (indiquant l'extension) et vérifie que ce point n'appartient pas à un répertoire (en comparant sa position avec celle du dernier séparateur de chemin). Le traitement bifurque ensuite en fonction d'un drapeau qui indique le type d'image à produire: pour les images en couleur (flag==1), l'extension est remplacée par ".ppm" (Portable PixMap), tandis que pour les images en niveaux de gris, elle devient ".pgm" (Portable GrayMap). La mise en œuvre inclut une gestion rigoureuse des ressources mémoire avec l'allocation dynamique exactement dimensionnée pour accueillir le nouveau nom de fichier, et des vérifications appropriées pour éviter les fuites mémoire en cas d'échec d'allocation. Ce module illustre une conception pragmatique qui facilite le flux de travail du décodeur en standardisant la nomenclature des fichiers de sortie tout en préservant l'information sur leur nature (couleur ou niveaux de gris) directement dans l'extension. Cette approche simplifie considérablement l'utilisation du décodeur dans des pipelines de traitement d'images plus larges où l'identification automatique des formats est souvent requise.
@@ -115,6 +156,10 @@ Le module de traitement des couleurs constitue l'orchestrateur principal du pipe
 
 Le module de traitement des images en niveaux de gris constitue une implémentation épurée et optimisée du pipeline de décodage JPEG pour les images monochromes. L'implémentation s'articule autour de la fonction `traitement_grayscale` qui exécute séquentiellement les étapes essentielles de décompression avec une architecture simplifiée par rapport au traitement couleur. Le processus débute par l'initialisation des paramètres critiques et le calcul précis des dimensions de l'image en termes de MCUs (Minimum Coded Units), déterminant ainsi le nombre total de blocs 8×8 nécessaires pour reconstruire l'image complète. Une caractéristique distinctive de cette implémentation est sa gestion d'une unique composante de luminance (Y), éliminant ainsi la complexité inhérente aux formats d'échantillonnage chromatique. La séquence de décodage proprement dite commence par la génération des tables de Huffman adaptées aux composantes DC et AC à partir des spécifications extraites de l'en-tête JPEG. Pour chaque MCU, le module applique méthodiquement quatre transformations fondamentales : (1) le décodage du flux compressé via la fonction `decoder_bloc` qui utilise les tables Huffman pour reconstituer les 64 coefficients DCT quantifiés, (2) la quantification inverse qui restaure l'amplitude des coefficients fréquentiels, (3) l'inversion du parcours zigzag qui réorganise les coefficients en une matrice 8×8 selon leur disposition spatiale originale, et (4) l'application de la transformée DCT inverse optimisée qui convertit les coefficients fréquentiels en valeurs de pixels dans le domaine spatial. Chaque bloc décodé est immédiatement intégré à la structure de l'image finale via la fonction `copy_mcu_to_image`, avec une gestion méticuleuse des ressources mémoire qui libère systématiquement les allocations temporaires après chaque traitement de bloc. Cette approche séquentielle optimise l'empreinte mémoire du décodeur même pour des images de grande taille. L'implémentation se distingue par sa concision et son efficacité, privilégiant une approche directe qui élimine les étapes superflues tout en maintenant la fidélité à l'image originale, constituant ainsi une solution idéale pour les applications nécessitant un traitement rapide d'images JPEG en niveaux de gris.
 
+#### Upsampling chromatique (upsampling.c)
+
+Le module `upsampling.c` implémente les différentes méthodes de sur-échantillonnage (upsampling) nécessaires pour convertir les composantes de chrominance Cb et Cr sous-échantillonnées en matrices de taille compatible avec la luminance Y. Il propose des fonctions dédiées pour chaque format d'échantillonnage courant du JPEG : `up_sampling4_2_2_horizontal` pour le 4:2:2 horizontal, `up_sampling4_2_2_vertical` pour le 4:2:2 vertical, et `up_sampling4_2_0` pour le 4:2:0. Chaque fonction alloue dynamiquement les matrices de sortie et duplique les valeurs de chrominance selon le schéma d'échantillonnage, permettant ainsi une recombinaison correcte des couleurs lors de la conversion YCbCr vers RGB.
+
 #### Conversion YCbCr vers RGB (ycbcr_rgb.c)
 
 Le module de conversion YCbCr vers RGB constitue une composante essentielle du décodeur JPEG pour les images en couleur, assurant la transition finale du format colorimétrique utilisé en compression vers l'espace RGB conventionnel pour l'affichage. 
@@ -126,15 +171,19 @@ Un mécanisme de saturation est systématiquement appliqué aux valeurs RGB rés
 L'architecture mémoire du module révèle une gestion soignée avec des allocations dynamiques adaptées aux dimensions de l'image, organisées selon une structure matricielle qui facilite l'accès séquentiel lors des traitements ultérieurs. 
 Cette implémentation constitue l'étape finale cruciale qui transforme les données décompressées et traitées en une représentation visuelle fidèle et prête à l'affichage, complétant ainsi le pipeline de décodage pour les images JPEG en couleur.
 
-#### Transformation zigzag inverse (zigzag.c)
+------------------------------------------------------------------------
+### Structure générale et flux du programme
 
-Le module de transformation zigzag inverse constitue une étape fondamentale dans le processus de décodage JPEG, responsable de la reconstitution spatiale des coefficients DCT préalablement linéarisés selon un parcours spécifique optimisé pour la compression. 
-L'implémentation s'articule autour de la fonction `inverse_zigzag` qui opère méthodiquement en transformant un vecteur unidimensionnel de 64 éléments en une matrice bidimensionnelle 8×8, restaurant ainsi la disposition spatiale originale des coefficients fréquentiels. 
-Le cœur algorithmique exploite une propriété mathématique élégante : tous les éléments situés sur une même diagonale partagent une valeur identique pour la somme de leurs indices de ligne et de colonne. 
-L'algorithme procède par un parcours séquentiel des 15 diagonales possibles (représentées par la somme ligne+colonne variant de 0 à 14), en alternant systématiquement entre deux types de trajectoires selon la parité de cette somme. 
-Lorsque la somme est paire, le module parcourt la diagonale du bas vers le haut (de bas-gauche vers haut-droit), tandis que lorsqu'elle est impaire, il parcourt la diagonale du haut vers le bas (de haut-gauche vers bas-droit). 
-Cette logique bidirectionnelle reflète exactement l'inverse du parcours zigzag utilisé lors de la compression, qui concentre les coefficients non-nuls en début de séquence. 
-L'implémentation démontre une concision remarquable avec seulement quatre variables de contrôle (`i` pour l'indice du vecteur, `ligne` et `col` pour les coordonnées matricielles, et `slc` pour la somme ligne+colonne), articulées autour de deux boucles imbriquées qui sélectionnent la direction de parcours appropriée selon la parité. 
-Des vérifications de bornes (`ligne < 8 && col < 8`) garantissent que seules les positions valides de la matrice 8×8 sont accédées. 
-Cette transformation est essentielle pour préparer les coefficients à l'étape de quantification inverse puis à la DCT inverse, contribuant ainsi directement à la reconstruction fidèle de l'image d'origine à partir de sa représentation compressée.
+Le programme suit un pipeline séquentiel typique d'un décodeur JPEG :
+1. Lecture et analyse des en-têtes JPEG pour extraire les paramètres et tables nécessaires.
+2. Décodage Huffman et extraction des blocs de coefficients DCT pour chaque composante.
+3. Quantification inverse et réorganisation zigzag inverse des coefficients.
+4. Application de la transformation DCT inverse (IDCT) pour obtenir les valeurs spatiales.
+5. Upsampling des composantes chromatiques si nécessaire.
+6. Conversion des composantes YCbCr en RGB (pour les images couleur).
+7. Construction de l'image finale et écriture au format PGM ou PPM.
+
+Chaque étape est prise en charge par un module dédié, favorisant la clarté, la modularité et la maintenabilité du code.
+
+------------------------------------------------------------------------
 

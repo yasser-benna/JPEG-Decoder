@@ -19,10 +19,11 @@ int traitement_color(IMAGE* image, IMAGE_D* image_d){
     int H_Cr = image->COMPONENTS[2].h_factor;  
     int V_Cr = image->COMPONENTS[2].v_factor;
     SamplingFormat forbloc;
-    if (H_Y == H_Cr && H_Cb == H_Cr && V_Y == V_Cr && V_Cb == V_Cr) {forbloc=SAMPLING_444;}
-    else if (H_Y == 2 * H_Cr && V_Y == V_Cb && H_Cb == H_Cr && V_Y == V_Cr && V_Cb == V_Cr) {forbloc=SAMPLING_422_H;}
-    else if (H_Y == H_Cr && V_Y == 2 * V_Cb && H_Cb == H_Cr && V_Y == 2 * V_Cr && V_Cb == V_Cr) {forbloc=SAMPLING_422_V;}
-    else if (H_Y == 2 * H_Cr && H_Cb == H_Cr && V_Y == 2 * V_Cr && V_Cb == V_Cr) {forbloc=SAMPLING_420;}
+    int rows_to_free = 0;
+    if (H_Y == H_Cr && H_Cb == H_Cr && V_Y == V_Cr && V_Cb == V_Cr) {forbloc=SAMPLING_444;rows_to_free = 8;}
+    else if (H_Y == 2 * H_Cr && V_Y == V_Cb && H_Cb == H_Cr && V_Y == V_Cr && V_Cb == V_Cr) {forbloc=SAMPLING_422_H;rows_to_free = 8;}
+    else if (H_Y == H_Cr && V_Y == 2 * V_Cb && H_Cb == H_Cr && V_Y == 2 * V_Cr && V_Cb == V_Cr) {forbloc=SAMPLING_422_V;rows_to_free = V_Y * 8;}
+    else if (H_Y == 2 * H_Cr && H_Cb == H_Cr && V_Y == 2 * V_Cr && V_Cb == V_Cr) {forbloc=SAMPLING_420;rows_to_free = V_Y * 8;}
     else {
         forbloc=SAMPLING_UNSUPPORTED;
         fprintf(stderr, "Forbloc de sous-échantillonnage non supporté.\n");
@@ -113,10 +114,10 @@ int traitement_color(IMAGE* image, IMAGE_D* image_d){
                     free_cb_spatial = 0;
                     break;
                 case SAMPLING_422_H:
-                    up_sampling4_2_2_horizontal(cb_spatial,&Cb_final[mcu][b], H_Y, V_Y);
+                    up_sampling4_2_2_horizontal(cb_spatial,&Cb_final[mcu][b], H_Y);
                     break;
                 case SAMPLING_422_V:
-                    up_sampling4_2_2_vertical(cb_spatial,&Cb_final[mcu][b], H_Y, V_Y);
+                    up_sampling4_2_2_vertical(cb_spatial,&Cb_final[mcu][b], V_Y);
                     break;
                 case SAMPLING_420:
                     up_sampling4_2_0(cb_spatial, &Cb_final[mcu][b], H_Y, V_Y);
@@ -144,10 +145,10 @@ int traitement_color(IMAGE* image, IMAGE_D* image_d){
                     free_cr_spatial = 0;
                     break;
                 case SAMPLING_422_H:
-                    up_sampling4_2_2_horizontal(cr_spatial,&Cr_final[mcu][b], H_Y, V_Y);
+                    up_sampling4_2_2_horizontal(cr_spatial,&Cr_final[mcu][b], H_Y);
                     break;
                 case SAMPLING_422_V:
-                    up_sampling4_2_2_vertical(cr_spatial, &Cr_final[mcu][b], H_Y, V_Y);
+                    up_sampling4_2_2_vertical(cr_spatial, &Cr_final[mcu][b],V_Y);
                     break;
                 case SAMPLING_420:
                     up_sampling4_2_0(cr_spatial, &Cr_final[mcu][b], H_Y, V_Y);
@@ -166,38 +167,40 @@ int traitement_color(IMAGE* image, IMAGE_D* image_d){
         }
         YCbCr_to_rgb(Y_final[mcu], Cb_final[mcu], Cr_final[mcu], &R, &G, &B, H_Y, V_Y, nb_blocs_Y, nb_blocs_Cb, forbloc);
         copy_mcu_to_image(image_d, R, G, B, mcu, nb_mcus_x, H_Y, V_Y);
-        // // Free RGB arrays
-        // for (int i = 0; i < 8 * V_Y; i++) {
-        //     free(R[i]);
-        //     free(G[i]);
-        //     free(B[i]);
-        // }
-        // free(R);
-        // free(G);
-        // free(B);
-        // //free Yfinal, Cb_final, Cr_final
-        // for (int b = 0; b < nb_blocs_Y; b++) {
-        //     for (int i = 0; i <8; i++) {
-        //         free(Y_final[mcu][b][i]);
-        //     }
-        //     free(Y_final[mcu][b]);
-        // }
-        // free(Y_final[mcu]);
-        // for (int b = 0; b < nb_blocs_Cb; b++) {
-        //     for(int i=0;i< V_Y*8;i++){
-        //         free(Cb_final[mcu][b][i]);
-        //     }
-        //     free(Cb_final[mcu][b]);
-        // }
-        // free(Cb_final[mcu]);
-        // for (int b = 0; b < nb_blocs_Cr; b++) {
-        //     for(int i=0;i< V_Y*8;i++){
-        //         free(Cr_final[mcu][b][i]);
-        //     }
-        //     free(Cr_final[mcu][b]);
-        // }
-        // free(Cr_final[mcu]);
+        // Free RGB arrays
+        for (int i = 0; i < 8 * V_Y; i++) {
+            free(R[i]);
+            free(G[i]);
+            free(B[i]);
+        }
+        free(R);
+        free(G);
+        free(B);
+        //free Yfinal, Cb_final, Cr_final
+        for (int b = 0; b < nb_blocs_Y; b++) {
+            for (int i = 0; i <8; i++) {
+                free(Y_final[mcu][b][i]);
+            }
+            free(Y_final[mcu][b]);
+        }
+        free(Y_final[mcu]);
+        for (int b = 0; b < nb_blocs_Cb; b++) {
+            for (int i = 0; i < rows_to_free; i++) {
+                free(Cb_final[mcu][b][i]);
+            }
+            free(Cb_final[mcu][b]);
+        }
+        free(Cb_final[mcu]);
+        
+        for (int b = 0; b < nb_blocs_Cr; b++) {
+            for (int i = 0; i < rows_to_free; i++) {
+                free(Cr_final[mcu][b][i]);
+            }
+            free(Cr_final[mcu][b]);
+        }
+        free(Cr_final[mcu]);
     }
+
     for (int i = 0; i < 8; i++) {
         free(Y_bloc[i]);
         free(cb_bloc[i]);

@@ -1,11 +1,7 @@
-#include <stdio.h>  
 #include <stdlib.h> 
-#include <stdint.h>   
-#include <string.h> 
+#include <stdint.h>    
 #include "huffman.h"
-#include "bitsmanip.h"
 #include "extraction_bloc.h"
-#include "reader.h"
 
 /*Cette fonction permet de décoder l'ensemble des MCUs  de l'image JPEG compressée,et en extrait les blocs 
 de coefficients pour chaque composante Y , Cb et Cr en utilisant la fonction décoder bloc qui s'applique 

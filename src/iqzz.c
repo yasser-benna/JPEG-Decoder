@@ -1,6 +1,5 @@
 #include <stdint.h>
-#include <stdio.h>
-#include <stdlib.h>
+
 
 #define N 8
 // fonction de quantification inverse
