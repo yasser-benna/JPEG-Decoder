@@ -51,28 +51,28 @@ La répartition des tâches a été effectuée en tenant compte des compétences
 ------------------------------------------------------------------------
 ### Graphe de dependance
 
-jpeg2ppm.c (main)
-├── reader.c
-│   └── bitsmanip.c
-├── output_file.c
-├── writter.c
-├── traitement_gris.c
-│   ├── huffman.c
-│   │   └── bitsmanip.c
-│   ├── zigzag.c
-│   ├── iqzz.c
-│   ├── idct.c
-├── traitement_couleur.c
-│   ├── huffman.c
-│   │   └── bitsmanip.c
-│   ├── zigzag.c
-│   ├── iqzz.c
-│   ├── idct.c
-│   ├── upsampling.c
-│   ├── ycbcr_rgb.c
-│   └── extraction_bloc.c
-│       └── huffman.c
-│           └── bitsmanip.c
+jpeg2ppm.c (main)  
+├── reader.c  
+│   └── bitsmanip.c  
+├── output_file.c  
+├── writter.c  
+├── traitement_gris.c  
+│   ├── huffman.c  
+│   │   └── bitsmanip.c  
+│   ├── zigzag.c  
+│   ├── iqzz.c  
+│   ├── idct.c  
+├── traitement_couleur.c  
+│   ├── huffman.c  
+│   │   └── bitsmanip.c  
+│   ├── zigzag.c  
+│   ├── iqzz.c  
+│   ├── idct.c  
+│   ├── upsampling.c  
+│   ├── ycbcr_rgb.c  
+│   └── extraction_bloc.c  
+│       └── huffman.c  
+│           └── bitsmanip.c  
 
 ------------------------------------------------------------------------
 ### Détails pour chaque mission
