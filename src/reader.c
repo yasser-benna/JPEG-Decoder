@@ -19,7 +19,7 @@ IMAGE* init_image() {
     IMAGE* img = malloc(sizeof(IMAGE));
     if (!img) {
         fprintf(stderr,"Erreur d'allocation IMAGE\n");
-        exit(1);
+        exit(3);
     }
     img->Largeur = 0;
     img->Hauteur = 0;
